@@ -24,7 +24,6 @@ namespace SCDBackend.DataAccess
 
         public CosmosConnector()
         {
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         }
 
 
