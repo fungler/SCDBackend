@@ -43,6 +43,11 @@ namespace SCDBackend
 
             app.UseAuthorization();
 
+            app.UseCors(policy =>
+                policy.WithOrigins("http://localhost:5000", "https://localhost:5001")
+                .AllowAnyMethod()
+                .AllowCredentials());
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

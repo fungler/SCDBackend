@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 
 namespace SCDBackend.Controllers
 {
@@ -12,6 +13,7 @@ namespace SCDBackend.Controllers
     public class HomeController : ControllerBase
     {
         [HttpGet]
+        [EnableCors]
         public string Get()
         {
             return "Running";
