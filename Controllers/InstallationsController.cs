@@ -26,5 +26,14 @@ namespace SCDBackend.Controllers
 
             return Ok(json);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> getInstallation(string id)
+        {
+            CosmosConnector cc = CosmosConnector.instance;
+            Installation inst = await cc.GetInstallationAsync(id);
+            string json = JsonSerializer.Serialize(inst);
+            return Ok(json);
+        }
     }
 }

@@ -72,5 +72,23 @@ namespace SCDBackend.DataAccess
                 Console.WriteLine("Except");
             }
         }
+
+        public async Task<Installation> GetInstallationAsync(string id)
+        {
+            QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.id = @id")
+                .WithParameter("@id", id);
+            FeedIterator<Installation> queryResultSetIterator = container.GetItemQueryIterator<Installation>(qd);
+            Installation inst = null;
+
+            if (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<Installation> res = await queryResultSetIterator.ReadNextAsync();
+                foreach (Installation i in res)
+                {
+                    inst = i;
+                }
+            }
+            return inst;
+        }
     }
 }
