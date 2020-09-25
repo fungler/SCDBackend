@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using SCDBackend.DataAccess;
 using SCDBackend.Models;
 using System.Text.Json;
+using Microsoft.AspNetCore.Cors;
 
 namespace SCDBackend.Controllers
 {
@@ -17,12 +18,21 @@ namespace SCDBackend.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
         {
-            CosmosConnector cc = CosmosConnector.instance;
-            await cc.establishConnection(); // ensure that we are connected to the db before use
+            string json;
 
-            List<Installation> installations = await cc.GetInstallationsAsync();
+            try
+            {
+                CosmosConnector cc = CosmosConnector.instance;
+                await cc.establishConnection(); // ensure that we are connected to the db before use
 
-            string json = JsonSerializer.Serialize(installations);
+                List<Installation> installations = await cc.GetInstallationsAsync();
+
+                json = JsonSerializer.Serialize(installations);
+            } 
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
 
             return Ok(json);
         }
@@ -30,10 +40,28 @@ namespace SCDBackend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> getInstallation(string id)
         {
-            CosmosConnector cc = CosmosConnector.instance;
-            Installation inst = await cc.GetInstallationAsync(id);
-            string json = JsonSerializer.Serialize(inst);
+            string json;
+            try
+            {
+                CosmosConnector cc = CosmosConnector.instance;
+                await cc.establishConnection();
+
+                Installation inst = await cc.GetInstallationAsync(id);
+
+                json = JsonSerializer.Serialize(inst);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+
             return Ok(json);
+        }
+
+        [HttpPost("launch")]
+        public async Task<IActionResult> launchInstallation([FromBody] Launch installation_id)
+        {
+            return Ok("Recieved: " + installation_id.installation_id);
         }
     }
 }
