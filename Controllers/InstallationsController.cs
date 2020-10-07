@@ -37,16 +37,17 @@ namespace SCDBackend.Controllers
             return Ok(json);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> getInstallation(string id)
+        [HttpGet("name/{name}")]
+        public async Task<IActionResult> getInstallation(string name)
         {
             string json;
             try
             {
+                Console.Write(name);
                 CosmosConnector cc = CosmosConnector.instance;
                 await cc.establishConnection();
 
-                Installation inst = await cc.GetInstallationAsync(id);
+                Installation inst = await cc.GetInstallationAsync(name);
 
                 json = JsonSerializer.Serialize(inst);
             }
@@ -56,12 +57,6 @@ namespace SCDBackend.Controllers
             }
 
             return Ok(json);
-        }
-
-        [HttpPost("launch")]
-        public async Task<IActionResult> launchInstallation([FromBody] Launch installation_id)
-        {
-            return Ok("Recieved: " + installation_id.installation_id);
         }
     }
 }
