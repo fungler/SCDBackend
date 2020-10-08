@@ -15,11 +15,8 @@ namespace SCDBackend.Controllers
 
     public class MoveInstallationController : ControllerBase
     {
-        [HttpGet]
-        public String Get()
-        {
-            return "Running";
-        }
+        private static string sddBasePath = "https://localhost:7001";
+        private static CosmosConnector cc = new CosmosConnector();
 
         [HttpPost("new")]
         public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 
@@ -34,9 +31,6 @@ namespace SCDBackend.Controllers
             }
 
             Installation i = new Installation(content.installation.name, "20.52.46.188:3389", content.subscriptionId, null);
-
-            CosmosConnector cc = CosmosConnector.instance;
-            await cc.establishConnection();
             await cc.CreateInstallationAsync(i);
 
             // Respond to caller
@@ -47,8 +41,7 @@ namespace SCDBackend.Controllers
         {
             HttpClient client = new HttpClient();
             var json = JsonSerializer.Serialize(instRoot);
-            var response =  await client.PostAsync("https://localhost:7001/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
-            Console.WriteLine(response.StatusCode);
+            var response =  await client.PostAsync(sddBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
             return response;
         }
     }

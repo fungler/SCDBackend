@@ -11,9 +11,6 @@ namespace SCDBackend
     {
         public static async Task Main(string[] args)
         {
-            HttpClient c = new HttpClient();
-            var a = await c.GetAsync("https://localhost:7001/api/home");
-            Console.Write(a.Content);
             CreateHostBuilder(args).Build().Run();
         }
 

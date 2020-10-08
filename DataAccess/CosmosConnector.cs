@@ -35,7 +35,7 @@ namespace SCDBackend.DataAccess
             }
         }
 
-        public async Task establishConnection()
+        private async Task EstablishConnection()
         {
             try
             {
@@ -53,6 +53,7 @@ namespace SCDBackend.DataAccess
 
         public async Task<List<Installation>> GetInstallationsAsync()
         {
+            await EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
 
             FeedIterator<Installation> queryResultSetIterator = container.GetItemQueryIterator<Installation>(qd);
@@ -73,6 +74,7 @@ namespace SCDBackend.DataAccess
 
         public async Task<Installation> GetInstallationAsync(string name)
         {
+            await EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.name = @name")
                 .WithParameter("@name", name);
 
@@ -95,6 +97,7 @@ namespace SCDBackend.DataAccess
         // TODO check if installation exists
         public async Task CreateInstallationAsync(Installation installation) 
         {
+            await EstablishConnection();
             Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
             var installationItemResponse = await c.CreateItemAsync<Installation>(installation, new PartitionKey(installation.installation));
         }

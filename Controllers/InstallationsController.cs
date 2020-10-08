@@ -15,18 +15,15 @@ namespace SCDBackend.Controllers
     [ApiController]
     public class InstallationsController : ControllerBase
     {
+        private static CosmosConnector cc = CosmosConnector.instance;
+
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
         {
             string json;
-
             try
             {
-                CosmosConnector cc = CosmosConnector.instance;
-                await cc.establishConnection(); // ensure that we are connected to the db before use
-
                 List<Installation> installations = await cc.GetInstallationsAsync();
-
                 json = JsonSerializer.Serialize(installations);
             } 
             catch (Exception e)
@@ -43,11 +40,7 @@ namespace SCDBackend.Controllers
             string json;
             try
             {
-                CosmosConnector cc = CosmosConnector.instance;
-                await cc.establishConnection();
-
                 Installation inst = await cc.GetInstallationAsync(name);
-
                 json = JsonSerializer.Serialize(inst);
             }
             catch (Exception e)
