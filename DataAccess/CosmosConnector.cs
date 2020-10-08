@@ -20,7 +20,7 @@ namespace SCDBackend.DataAccess
         private static string containerId = "dummyInstallations";
 
         private static CosmosClient cosmosClient;
-        private static Database database;
+        private static Microsoft.Azure.Cosmos.Database database;
         private static Container container;
 
         public CosmosConnector() {}

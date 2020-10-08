@@ -43,7 +43,6 @@ namespace SCDBackend.Controllers
             string json;
             try
             {
-                Console.Write(name);
                 CosmosConnector cc = CosmosConnector.instance;
                 await cc.establishConnection();
 
