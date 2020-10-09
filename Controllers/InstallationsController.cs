@@ -8,6 +8,7 @@ using SCDBackend.DataAccess;
 using SCDBackend.Models;
 using System.Text.Json;
 using Microsoft.AspNetCore.Cors;
+using System.Net.Http;
 
 namespace SCDBackend.Controllers
 {
@@ -49,6 +50,30 @@ namespace SCDBackend.Controllers
             }
 
             return Ok(json);
+        }
+
+        [HttpGet("json")]
+        public async Task<IActionResult> getInstallationJson([FromQuery] string path)
+        {
+
+            // Der er problemer med ssl certification, så dette er bare en måde at bypass'e det
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync("https://localhost:7001/api/home/registerJson/getFile?path=" + path);
+
+                string json =  await response.Content.ReadAsStringAsync();
+
+                return Ok(json);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+
         }
     }
 }
