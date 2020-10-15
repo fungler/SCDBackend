@@ -91,7 +91,10 @@ namespace SCDBackend.Controllers
 
             try
             {
-                string jsonBody = "{\"oldName\": \"" + data.oldName + "\", \"newName\": \"" + data.newName + "\"}";
+                // what the fuck am i doing
+                //string jsonBody = "{\"oldName\": \"" + data.oldName + "\", \"newName\": \"" + data.newName + "\"}";
+
+                string jsonBody = JsonSerializer.Serialize(data);
 
                 HttpResponseMessage response = await client.PostAsync("https://localhost:7001/api/home/registerJson/copy", new StringContent(jsonBody, Encoding.UTF8, "application/json"));
                 HttpStatusCode status = response.StatusCode;

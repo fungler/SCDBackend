@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace SCDBackend.Models
 {
+    [Serializable]
     public class CopyData
     {
         public string oldName { get; set; }
