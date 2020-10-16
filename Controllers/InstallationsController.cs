@@ -81,20 +81,20 @@ namespace SCDBackend.Controllers
 
 
         [HttpPost("json/copy")]
-        public async Task<IActionResult> createInstallationCopy([FromBody] CopyData data)
+        public async Task<IActionResult> createInstallationCopy([FromBody] CopyDataDB data)
         {
 
-            // Der er problemer med ssl certification, så dette er bare en måde at bypass'e det
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             HttpClient client = new HttpClient(clientHandler);
 
             try
             {
-                // what the fuck am i doing
-                //string jsonBody = "{\"oldName\": \"" + data.oldName + "\", \"newName\": \"" + data.newName + "\"}";
+                InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", "d6741d73-abee-41f5-b0f5-886bd849a2b2", data.copyMethod, data.clients);
+                await cc.CreateInstallationAsync(copyInstallation);
 
-                string jsonBody = JsonSerializer.Serialize(data);
+                // skal serialize dataen vi får til et json object, så derfor har jeg bare lavet en ny class der kun har de felter som skal sendes videre til SDDBackend
+                string jsonBody = JsonSerializer.Serialize(new CopyData(data.oldName, data.newName));
 
                 HttpResponseMessage response = await client.PostAsync("https://localhost:7001/api/home/registerJson/copy", new StringContent(jsonBody, Encoding.UTF8, "application/json"));
                 HttpStatusCode status = response.StatusCode;

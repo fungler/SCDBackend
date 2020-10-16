@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 namespace SCDBackend.Models
 {
     [Serializable]
-    public class CopyData
+    public class CopyDataDB
     {
         public string oldName { get; set; }
         public string newName { get; set; }
-
-        public CopyData(string oldName, string newName)
-        {
-            this.oldName = oldName;
-            this.newName = newName;
-        }
+        public string copyMethod { get; set; }
+        public List<Client> clients { get; set; }
     }
 }
