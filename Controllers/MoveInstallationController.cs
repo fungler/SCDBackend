@@ -39,7 +39,11 @@ namespace SCDBackend.Controllers
 
         private async Task<HttpResponseMessage> WriteToSDD(InstallationRoot instRoot) 
         {
-            HttpClient client = new HttpClient();
+            // bypass
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+
             var json = JsonSerializer.Serialize(instRoot);
             var response =  await client.PostAsync(sddBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
             return response;
