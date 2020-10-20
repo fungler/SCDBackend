@@ -33,7 +33,7 @@ namespace SCDBackend.Models
     [Serializable]
     public class InstallationCopy
     {
-        public InstallationCopy(string name, string fullAddress, string subscription, string copyMethod, Client clients)
+        public InstallationCopy(string name, string fullAddress, Subscription subscription, string copyMethod, Client client)
         {
             this.id = Guid.NewGuid();
             this.name = name;
@@ -50,7 +50,7 @@ namespace SCDBackend.Models
 
         public string fullAddress { get; set; }
 
-        public string subscription { get; set; }
+        public Subscription subscription { get; set; }
         public string copyMethod { get; set; }
         public Client client { get; set; }
     }

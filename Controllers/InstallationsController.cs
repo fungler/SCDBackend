@@ -74,6 +74,7 @@ namespace SCDBackend.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
                 return BadRequest(e.StackTrace);
             }
 
@@ -88,9 +89,11 @@ namespace SCDBackend.Controllers
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             HttpClient client = new HttpClient(clientHandler);
 
+            Console.WriteLine(data.client.name);
+
             try
             {
-                InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", "d6741d73-abee-41f5-b0f5-886bd849a2b2", data.copyMethod, data.client);
+                InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
                 await cc.CreateInstallationAsync(copyInstallation);
 
                 // skal serialize dataen vi får til et json object, så derfor har jeg bare lavet en ny class der kun har de felter som skal sendes videre til SDDBackend
@@ -103,11 +106,14 @@ namespace SCDBackend.Controllers
 
                 if (status == HttpStatusCode.OK)
                     return Ok(json);
-                else
+                else{
+                    Console.WriteLine("1");
                     return BadRequest(json);
+                }
             }
             catch (Exception e)
             {
+                Console.WriteLine("2" + e);
                 return BadRequest(e.StackTrace);
             }
         }
@@ -126,6 +132,22 @@ namespace SCDBackend.Controllers
                 return BadRequest(e.StackTrace);
             }
 
+            return Ok(json);
+        }
+
+        [HttpGet("clients/all")]
+        public async Task<IActionResult> getClients()
+        {
+            string json;
+            try
+            {
+                List<Client> clients = await cc.GetClients();
+                json = JsonSerializer.Serialize(clients);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
             return Ok(json);
         }
     }

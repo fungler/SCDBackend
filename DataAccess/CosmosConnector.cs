@@ -83,7 +83,6 @@ namespace SCDBackend.DataAccess
 
             if (queryResultSetIterator.HasMoreResults)
             {
-                Console.Write("testing something");
                 FeedResponse<Installation> res = await queryResultSetIterator.ReadNextAsync();
                 foreach (Installation i in res)
                 {
