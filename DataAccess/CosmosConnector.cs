@@ -90,7 +90,6 @@ namespace SCDBackend.DataAccess
                     inst = i;
                 }
             }
-            Console.Write(inst);
             return inst;
         }
 
@@ -129,6 +128,69 @@ namespace SCDBackend.DataAccess
                 }
             }
             return res;
+        }
+
+        public async Task<Subscription> GetSubScription(string id)
+        {
+            await EstablishConnection();
+            QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.id = @id").WithParameter("@id", id);
+            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("subscriptions", "/subscriptions"));
+
+            FeedIterator<Subscription> queryResultSetIterator = c.GetItemQueryIterator<Subscription>(qd);
+            Subscription sub = null;
+
+            if (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<Subscription> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+
+                foreach(Subscription s in currentResultSet)
+                {
+                    sub = s;
+                }
+            }
+            return sub;
+        }
+
+        public async Task<List<Client>> GetClients()
+        {
+            await EstablishConnection();
+            QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
+            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("clients", "/clients"));
+
+            FeedIterator<Client> queryResultSetIterator = c.GetItemQueryIterator<Client>(qd);
+            List<Client> res = new List<Client>();
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<Client> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+
+                foreach(Client cl in currentResultSet)
+                {
+                    res.Add(cl);
+                }
+            }
+            return res;
+        }
+
+        public async Task<Client> GetClient(string id)
+        {
+            await EstablishConnection();
+            QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.id = @id").WithParameter("@id", id);
+            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("clients", "/clients"));
+
+            FeedIterator<Client> queryResultSetIterator = c.GetItemQueryIterator<Client>(qd);
+            Client client = null;
+
+            if (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<Client> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+
+                foreach(Client cl in currentResultSet)
+                {
+                    client = cl;
+                }
+            }
+            return client;
         }
     }
 }

@@ -26,11 +26,15 @@ namespace SCDBackend.Controllers
 
             if(!SDDResponse.IsSuccessStatusCode) 
             {
-                Console.WriteLine("hello");
                 return BadRequest(SDDResponse.Content);
             }
 
-            Installation i = new Installation(content.installation.name, "20.52.46.188:3389", content.subscriptionId, null);
+            Subscription sub = await cc.GetSubScription(content.subscriptionId);
+            Console.WriteLine(sub);
+            Client client = await cc.GetClient("1"); 
+
+            // Adding random client since the JSON document doesn't contain a client
+            Installation i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client);
             await cc.CreateInstallationAsync(i);
 
             // Respond to caller

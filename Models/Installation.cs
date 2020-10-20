@@ -8,7 +8,7 @@ namespace SCDBackend.Models
     public class Installation
     {
 
-        public Installation(string name, string fullAddress, string subscription, List<Client> clients)
+        public Installation(string name, string fullAddress, Subscription subscription, Client client)
         {
             this.id = Guid.NewGuid();
             this.name = name;
@@ -16,7 +16,7 @@ namespace SCDBackend.Models
             this.fullAddress = fullAddress;
             this.subscription = subscription;
             this.copyMethod = "cold";
-            this.clients = clients;
+            this.client = client;
         }
 
         public Guid id { get; }
@@ -25,15 +25,15 @@ namespace SCDBackend.Models
 
         public string fullAddress { get; set; }
 
-        public string subscription { get; set; }
+        public Subscription subscription { get; set; }
         public string copyMethod { get; set; }
-        public List<Client> clients { get; set; }
+        public Client client { get; set; }
     }
 
     [Serializable]
     public class InstallationCopy
     {
-        public InstallationCopy(string name, string fullAddress, string subscription, string copyMethod, List<Client> clients)
+        public InstallationCopy(string name, string fullAddress, string subscription, string copyMethod, Client clients)
         {
             this.id = Guid.NewGuid();
             this.name = name;
@@ -41,7 +41,7 @@ namespace SCDBackend.Models
             this.fullAddress = fullAddress;
             this.subscription = subscription;
             this.copyMethod = copyMethod;
-            this.clients = clients;
+            this.client = client;
         }
 
         public Guid id { get; }
@@ -52,21 +52,15 @@ namespace SCDBackend.Models
 
         public string subscription { get; set; }
         public string copyMethod { get; set; }
-        public List<Client> clients { get; set; }
+        public Client client { get; set; }
     }
 
 
     [Serializable]
     public class Client
     {
-        public Client(string name)  
-        {
-            this.name = name;
-            this.id = Guid.NewGuid();
-        }
-
         public string name { get; set; }
-        public Guid id { get; set; }
+        public string id { get; set; }
     }
 
     public class Network
