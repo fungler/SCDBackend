@@ -110,7 +110,44 @@ namespace SCDBackend.Controllers
             {
                 return BadRequest(e.StackTrace);
             }
+        }
 
+        [HttpGet("subscriptions/all")]
+        public async Task<IActionResult> getSubscriptions()
+        {
+            string json;
+            try 
+            {
+                List<Subscription> sub = await cc.GetSubScriptions();
+                json = JsonSerializer.Serialize(sub);
+            } 
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+
+            return Ok(json);
         }
     }
 }
+
+/*
+
+        [HttpGet("name/{name}")]
+        public async Task<IActionResult> getInstallation(string name)
+        {
+            string json;
+            try
+            {
+                Installation inst = await cc.GetInstallationAsync(name);
+                json = JsonSerializer.Serialize(inst);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+
+            return Ok(json);
+        }
+
+        }*/

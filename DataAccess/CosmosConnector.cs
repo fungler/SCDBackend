@@ -109,5 +109,26 @@ namespace SCDBackend.DataAccess
             Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
             var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
         }
+
+        public async Task<List<Subscription>> GetSubScriptions()
+        {
+            await EstablishConnection();
+            QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
+            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("subscriptions", "/subscriptions"));
+
+            FeedIterator<Subscription> queryResultSetIterator = c.GetItemQueryIterator<Subscription>(qd);
+            List<Subscription> res = new List<Subscription>();
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<Subscription> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+
+                foreach(Subscription s in currentResultSet)
+                {
+                    res.Add(s);
+                }
+            }
+            return res;
+        }
     }
 }

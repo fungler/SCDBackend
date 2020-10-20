@@ -66,7 +66,7 @@ namespace SCDBackend.Models
         }
 
         public string name { get; set; }
-        public Guid id { get; }
+        public Guid id { get; set; }
     }
 
     public class Network
