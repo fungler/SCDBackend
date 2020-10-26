@@ -150,5 +150,56 @@ namespace SCDBackend.Controllers
             }
             return Ok(json);
         }
+
+        [HttpGet("item/getId")]
+        public async Task<IActionResult> getItemId([FromQuery] string name)
+        {
+            string json;
+            try
+            {
+                json = await cc.GetItemId(name);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+            return Ok(json);
+        }
+
+        [HttpGet("start")]
+        public async Task<IActionResult> startInstallation([FromQuery] string name)
+        {
+            try
+            {
+                int status = await cc.StartInstallation(name);
+
+                if (status == 1)
+                    return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                else
+                    return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation - check installation name.\"}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+        }
+
+        [HttpGet("stop")]
+        public async Task<IActionResult> stopInstallation([FromQuery] string name)
+        {
+            try
+            {
+                int status = await cc.StopInstallation(name);
+
+                if (status == 1)
+                    return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                else
+                    return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation - check installation name.\"}");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.StackTrace);
+            }
+        }
     }
 }

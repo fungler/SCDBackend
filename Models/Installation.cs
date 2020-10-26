@@ -17,6 +17,7 @@ namespace SCDBackend.Models
             this.subscription = subscription;
             this.copyMethod = "cold";
             this.client = client;
+            this.status = "cold";
         }
 
         public Guid id { get; }
@@ -28,6 +29,7 @@ namespace SCDBackend.Models
         public Subscription subscription { get; set; }
         public string copyMethod { get; set; }
         public Client client { get; set; }
+        public string status { get; set; }
     }
 
     [Serializable]
@@ -42,6 +44,7 @@ namespace SCDBackend.Models
             this.subscription = subscription;
             this.copyMethod = copyMethod;
             this.client = client;
+            this.status = "cold";
         }
 
         public Guid id { get; }
@@ -53,6 +56,7 @@ namespace SCDBackend.Models
         public Subscription subscription { get; set; }
         public string copyMethod { get; set; }
         public Client client { get; set; }
+        public string status { get; set; }
     }
 
 

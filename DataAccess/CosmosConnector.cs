@@ -192,5 +192,72 @@ namespace SCDBackend.DataAccess
             }
             return client;
         }
+
+        public async Task<string> GetItemId(string name)
+        {
+            await EstablishConnection();
+            QueryDefinition qd = new QueryDefinition("SELECT VALUE c.id FROM c WHERE c.name = @name")
+                .WithParameter("@name", name);
+
+            FeedIterator<string> queryResultSetIterator = container.GetItemQueryIterator<string>(qd);
+            string instId = "0";
+
+            if (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<string> res = await queryResultSetIterator.ReadNextAsync();
+                foreach (string i in res)
+                {
+                    instId = i;
+                }
+            }
+            return instId;
+        }
+        
+
+        public async Task<int> StartInstallation(string instName)
+        {
+            await EstablishConnection();
+            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+
+            Installation toReplace = null;
+            toReplace = await GetInstallationAsync(instName);
+
+            if (toReplace == null)
+                return 0;
+
+            toReplace.status = "started";
+
+            string toReplaceId = await GetItemId(instName);
+
+            if (toReplaceId == "0")
+                return 0;
+
+
+            await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
+            return 1;
+        }
+
+        public async Task<int> StopInstallation(string instName)
+        {
+            await EstablishConnection();
+            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+
+            Installation toReplace = null;
+            toReplace = await GetInstallationAsync(instName);
+
+            if (toReplace == null)
+                return 0;
+
+            toReplace.status = "stopped";
+
+            string toReplaceId = await GetItemId(instName);
+
+            if (toReplaceId == "0")
+                return 0;
+
+
+            await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
+            return 1;
+        }
     }
 }
