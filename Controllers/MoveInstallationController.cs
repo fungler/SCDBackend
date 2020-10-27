@@ -30,11 +30,24 @@ namespace SCDBackend.Controllers
             }
 
             Subscription sub = await cc.GetSubScription(content.subscriptionId);
-            Console.WriteLine(sub);
+            //Console.WriteLine(sub);
             Client client = await cc.GetClient("1"); 
 
             // Adding random client since the JSON document doesn't contain a client
             Installation i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client);
+
+            HttpResponseMessage installationStateResponse = await GetState(i.name);
+
+            if (installationStateResponse.IsSuccessStatusCode)
+            {
+                string installationState = await installationStateResponse.Content.ReadAsStringAsync();
+                i.state = installationState;
+            }
+            else
+            {
+                i.state = "failed";
+            }
+
             await cc.CreateInstallationAsync(i);
 
             // Respond to caller
@@ -50,6 +63,17 @@ namespace SCDBackend.Controllers
 
             var json = JsonSerializer.Serialize(instRoot);
             var response =  await client.PostAsync(sddBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
+            return response;
+        }
+
+        private async Task<HttpResponseMessage> GetState(string instName)
+        {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+
+            HttpResponseMessage response = await client.GetAsync(sddBasePath + "/api/home/registerJson/getState?name="+instName);
+         
             return response;
         }
     }

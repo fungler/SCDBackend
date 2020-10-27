@@ -89,11 +89,24 @@ namespace SCDBackend.Controllers
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             HttpClient client = new HttpClient(clientHandler);
 
-            Console.WriteLine(data.client.name);
+            //Console.WriteLine(data.client.name);
 
             try
             {
                 InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
+
+                HttpResponseMessage installationStateResponse = await GetState(data.oldName);
+
+                if (installationStateResponse.IsSuccessStatusCode)
+                {
+                    string installationState = await installationStateResponse.Content.ReadAsStringAsync();
+                    copyInstallation.state = installationState;
+                }
+                else
+                {
+                    copyInstallation.state = "failed";
+                }
+
                 await cc.CreateInstallationAsync(copyInstallation);
 
                 // skal serialize dataen vi får til et json object, så derfor har jeg bare lavet en ny class der kun har de felter som skal sendes videre til SDDBackend
@@ -107,13 +120,13 @@ namespace SCDBackend.Controllers
                 if (status == HttpStatusCode.OK)
                     return Ok(json);
                 else{
-                    Console.WriteLine("1");
+                    //Console.WriteLine("1");
                     return BadRequest(json);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("2" + e);
+                //Console.WriteLine("2" + e);
                 return BadRequest(e.StackTrace);
             }
         }
@@ -200,6 +213,17 @@ namespace SCDBackend.Controllers
             {
                 return BadRequest(e.StackTrace);
             }
+        }
+
+        private async Task<HttpResponseMessage> GetState(string instName)
+        {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+
+            HttpResponseMessage response = await client.GetAsync("https://localhost:7001/api/home/registerJson/getState?name=" + instName);
+
+            return response;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace SCDBackend.Models
             this.copyMethod = "cold";
             this.client = client;
             this.status = "cold";
+            this.state = "none";
         }
 
         public Guid id { get; }
@@ -30,6 +31,7 @@ namespace SCDBackend.Models
         public string copyMethod { get; set; }
         public Client client { get; set; }
         public string status { get; set; }
+        public string state { get; set; }
     }
 
     [Serializable]
@@ -45,6 +47,7 @@ namespace SCDBackend.Models
             this.copyMethod = copyMethod;
             this.client = client;
             this.status = "cold";
+            this.state = "none";
         }
 
         public Guid id { get; }
@@ -57,6 +60,7 @@ namespace SCDBackend.Models
         public string copyMethod { get; set; }
         public Client client { get; set; }
         public string status { get; set; }
+        public string state { get; set; }
     }
 
 
