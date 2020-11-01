@@ -21,22 +21,33 @@ namespace SCDBackend.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 
         {
-            // Call endpoint from SDD and see if it went well
-            HttpResponseMessage SDDResponse = await WriteToSDD(content);
+            Subscription sub = await cc.GetSubScription(content.subscriptionId);
+            Client client = await cc.GetClient("1");
+            HttpResponseMessage SDDResponse = null;
+            Installation i = null;
 
-            if(!SDDResponse.IsSuccessStatusCode) 
+            try 
+            {   
+                // Adding random client since the JSON document doesn't contain a client
+                i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client);
+                await cc.CreateInstallationAsync(i);
+            }
+            catch (Exception)
             {
-                return BadRequest(SDDResponse.Content);
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
 
-            Subscription sub = await cc.GetSubScription(content.subscriptionId);
-            Console.WriteLine(sub);
-            Client client = await cc.GetClient("1"); 
-
-            // Adding random client since the JSON document doesn't contain a client
-            Installation i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client);
-            await cc.CreateInstallationAsync(i);
-
+            try 
+            {
+                // Call endpoint from SDD and see if it went well
+                SDDResponse = await WriteToSDD(content);
+            } 
+            catch (Exception) when (!SDDResponse.IsSuccessStatusCode)
+            {
+                await cc.DeleteInstallation(i);
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
+            }
+            
             // Respond to caller
             return Ok("{\"status\": 200, \"message\": \"Success.\"}");
         }
@@ -45,7 +56,6 @@ namespace SCDBackend.Controllers
         {
             // bypass
             HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             HttpClient client = new HttpClient(clientHandler);
 
             var json = JsonSerializer.Serialize(instRoot);

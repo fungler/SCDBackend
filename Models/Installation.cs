@@ -15,9 +15,9 @@ namespace SCDBackend.Models
             this.installation = "PARTITIONKEY"; // Manually set since we are not partitioning the database
             this.fullAddress = fullAddress;
             this.subscription = subscription;
-            this.copyMethod = "cold";
+            this.copyMethod = "Cold";
             this.client = client;
-            this.status = "cold";
+            this.status = "Cold";
         }
 
         public Guid id { get; }

@@ -43,9 +43,8 @@ namespace SCDBackend
             app.UseRouting();
 
             app.UseCors(policy =>
-                policy.WithOrigins("http://localhost:5000", "https://localhost:5001")
-                .AllowAnyMethod().AllowAnyHeader()
-                .AllowCredentials());
+                policy.WithOrigins("*")
+                .AllowAnyMethod().AllowAnyHeader());
             
             app.UseAuthorization();
 
