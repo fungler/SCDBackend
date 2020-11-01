@@ -29,7 +29,7 @@ namespace SCDBackend.Controllers
             try 
             {   
                 // Adding random client since the JSON document doesn't contain a client
-                i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client);
+                i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
                 await cc.CreateInstallationAsync(i);
             }
             catch (Exception)
@@ -47,6 +47,11 @@ namespace SCDBackend.Controllers
                 await cc.DeleteInstallation(i);
                 return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
+            catch (Exception)
+            {
+                await cc.DeleteInstallation(i);
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
+            }
             
             // Respond to caller
             return Ok("{\"status\": 200, \"message\": \"Success.\"}");
@@ -60,6 +65,16 @@ namespace SCDBackend.Controllers
 
             var json = JsonSerializer.Serialize(instRoot);
             var response =  await client.PostAsync(sddBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
+            return response;
+        }
+
+        private async Task<HttpResponseMessage> GetState(string instName)
+        {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            HttpClient client = new HttpClient(clientHandler);
+
+            HttpResponseMessage response = await client.GetAsync(sddBasePath + "/api/home/registerJson/getState?name="+instName);
+         
             return response;
         }
     }

@@ -265,7 +265,9 @@ namespace SCDBackend.DataAccess
             await EstablishConnection();
             Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
             var documentLink = await GetInstallationAsync(inst.name);
-            var installationItemResponse = await c.DeleteItemAsync<Installation>(documentLink.id.ToString(), new PartitionKey(documentLink.installation));
+            Console.WriteLine(documentLink.id);
+            string id = await GetItemId(inst.name);
+            var installationItemResponse = await c.DeleteItemAsync<Installation>(id, new PartitionKey(documentLink.installation));
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SCDBackend.Models
     public class Installation
     {
 
-        public Installation(string name, string fullAddress, Subscription subscription, Client client)
+        public Installation(string name, string fullAddress, Subscription subscription, Client client, string state)
         {
             this.id = Guid.NewGuid();
             this.name = name;
@@ -17,7 +17,8 @@ namespace SCDBackend.Models
             this.subscription = subscription;
             this.copyMethod = "Cold";
             this.client = client;
-            this.status = "Cold";
+            this.status = "cold";
+            this.state = state;
         }
 
         public Guid id { get; }
@@ -30,6 +31,7 @@ namespace SCDBackend.Models
         public string copyMethod { get; set; }
         public Client client { get; set; }
         public string status { get; set; }
+        public string state { get; set; }
     }
 
     [Serializable]
@@ -45,6 +47,7 @@ namespace SCDBackend.Models
             this.copyMethod = copyMethod;
             this.client = client;
             this.status = "cold";
+            this.state = "none";
         }
 
         public Guid id { get; }
@@ -57,6 +60,7 @@ namespace SCDBackend.Models
         public string copyMethod { get; set; }
         public Client client { get; set; }
         public string status { get; set; }
+        public string state { get; set; }
     }
 
 
