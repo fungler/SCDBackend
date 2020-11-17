@@ -19,7 +19,10 @@ namespace SCDBackend.Controllers
     [ApiController]
     public class InstallationsController : ControllerBase
     {
+
         private static CosmosConnector cc = CosmosConnector.instance;
+        private static string sddBasePath = "https://localhost:7001";
+
 
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
@@ -38,6 +41,8 @@ namespace SCDBackend.Controllers
             return Ok(json);
         }
 
+
+
         [HttpGet("name/{name}")]
         public async Task<IActionResult> getInstallation(string name)
         {
@@ -54,6 +59,8 @@ namespace SCDBackend.Controllers
 
             return Ok(json);
         }
+
+
 
         [HttpGet("json")]
         public async Task<IActionResult> getInstallationJson([FromQuery] string path)
@@ -81,19 +88,67 @@ namespace SCDBackend.Controllers
         }
 
 
-        [HttpPost("json/copy")]
-        public async Task<IActionResult> createInstallationCopy([FromBody] CopyDataDB data)
-        {
 
+        [HttpPost("new")]
+        public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content)
+        {
+            HttpResponseMessage SDDResponse = await WriteToSDD(content);
+
+            if (!SDDResponse.IsSuccessStatusCode)
+            {
+                return BadRequest(SDDResponse.Content);
+            }
+
+            Subscription sub = await cc.GetSubScription(content.subscriptionId);
+            Client client = await cc.GetClient("1");
+
+            // Adding random client since the JSON document doesn't contain a client
+            Installation i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client);
+
+            HttpResponseMessage installationStateResponse = await GetState(i.name);
+
+            if (installationStateResponse.IsSuccessStatusCode)
+            {
+                string installationState = await installationStateResponse.Content.ReadAsStringAsync();
+                i.state = installationState;
+            }
+            else
+            {
+                i.state = "failed";
+            }
+
+            await cc.CreateInstallationAsync(i);
+
+            // Respond to caller
+            return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+        }
+
+
+
+        private async Task<HttpResponseMessage> WriteToSDD(InstallationRoot instRoot)
+        {
+            // bypass
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             HttpClient client = new HttpClient(clientHandler);
 
-            //Console.WriteLine(data.client.name);
+            var json = JsonSerializer.Serialize(instRoot);
+            var response = await client.PostAsync(sddBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
+            return response;
+        }
+
+
+
+        [HttpPost("json/copy")]
+        public async Task<IActionResult> createInstallationCopy([FromBody] CopyDataDB data)
+        {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
 
             try
             {
-                InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
+                Installation copyInstallation = new Installation(data.newName, "20.52.46.188:3389", data.Subscription, data.client, data.copyMethod);
 
                 HttpResponseMessage installationStateResponse = await GetState(data.oldName);
 
@@ -109,7 +164,6 @@ namespace SCDBackend.Controllers
 
                 await cc.CreateInstallationAsync(copyInstallation);
 
-                // skal serialize dataen vi får til et json object, så derfor har jeg bare lavet en ny class der kun har de felter som skal sendes videre til SDDBackend
                 string jsonBody = JsonSerializer.Serialize(new CopyData(data.oldName, data.newName));
 
                 HttpResponseMessage response = await client.PostAsync("https://localhost:7001/api/home/registerJson/copy", new StringContent(jsonBody, Encoding.UTF8, "application/json"));
@@ -119,17 +173,18 @@ namespace SCDBackend.Controllers
 
                 if (status == HttpStatusCode.OK)
                     return Ok(json);
-                else{
-                    //Console.WriteLine("1");
+
+                else
                     return BadRequest(json);
-                }
+                
             }
             catch (Exception e)
             {
-                //Console.WriteLine("2" + e);
                 return BadRequest(e.StackTrace);
             }
         }
+
+
 
         [HttpGet("subscriptions/all")]
         public async Task<IActionResult> getSubscriptions()
@@ -148,6 +203,8 @@ namespace SCDBackend.Controllers
             return Ok(json);
         }
 
+
+
         [HttpGet("clients/all")]
         public async Task<IActionResult> getClients()
         {
@@ -164,6 +221,8 @@ namespace SCDBackend.Controllers
             return Ok(json);
         }
 
+
+
         [HttpGet("item/getId")]
         public async Task<IActionResult> getItemId([FromQuery] string name)
         {
@@ -178,6 +237,8 @@ namespace SCDBackend.Controllers
             }
             return Ok(json);
         }
+
+
 
         [HttpGet("start")]
         public async Task<IActionResult> startInstallation([FromQuery] string name)
@@ -197,6 +258,8 @@ namespace SCDBackend.Controllers
             }
         }
 
+
+
         [HttpGet("stop")]
         public async Task<IActionResult> stopInstallation([FromQuery] string name)
         {
@@ -215,6 +278,8 @@ namespace SCDBackend.Controllers
             }
         }
 
+
+
         private async Task<HttpResponseMessage> GetState(string instName)
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
@@ -225,5 +290,7 @@ namespace SCDBackend.Controllers
 
             return response;
         }
+
+
     }
 }

@@ -101,13 +101,13 @@ namespace SCDBackend.DataAccess
         }
 
         // overload for installation copy
-        public async Task CreateInstallationAsync(InstallationCopy installation)
+        /*public async Task CreateInstallationAsync(InstallationCopy installation)
         {
             
             await EstablishConnection();
             Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
             var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
-        }
+        }*/
 
         public async Task<List<Subscription>> GetSubScriptions()
         {
