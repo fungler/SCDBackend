@@ -101,13 +101,13 @@ namespace SCDBackend.DataAccess
         }
 
         // overload for installation copy
-        public async Task CreateInstallationAsync(InstallationCopy installation)
+        /*public async Task CreateInstallationAsync(InstallationCopy installation)
         {
             
             await EstablishConnection();
             Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
             var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
-        }
+        }*/
 
         public async Task<List<Subscription>> GetSubScriptions()
         {
@@ -258,16 +258,6 @@ namespace SCDBackend.DataAccess
 
             await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
             return 1;
-        }
-
-        public async Task DeleteInstallation(Installation inst)
-        {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
-            var documentLink = await GetInstallationAsync(inst.name);
-            Console.WriteLine(documentLink.id);
-            string id = await GetItemId(inst.name);
-            var installationItemResponse = await c.DeleteItemAsync<Installation>(id, new PartitionKey(documentLink.installation));
         }
     }
 }
