@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kr4u7yf+yA/L0djY0RyGqoMoO5K0+1PHlm/46+cWpWI6svcv7melixs65vEx7YGf6WQUkYLblTMAZ+VX+ROTJg==",
+  "dgSpecHash": "zY4rXpVrCn0GZZtPoLOa9HOFgG6bCZzTy0sn7MqVxG7kkjWwlKgcvQPqEuSKQfxBOjdY1lnceXCKjpPu2RrxxA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackendDev\\SCDBackend.UnitTest\\SCDBackend.UnitTest.csproj",
+  "projectFilePath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackend\\SCDBackend.UnitTest\\SCDBackend.UnitTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Martin\\.nuget\\packages\\coverlet.collector\\1.2.0\\coverlet.collector.1.2.0.nupkg.sha512",
     "C:\\Users\\Martin\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",

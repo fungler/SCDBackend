@@ -9,7 +9,6 @@ namespace SCDBackend.UnitTest
         public void Test1()
         {
             Assert.True(true);
-            // ass
         }
     }
 }

@@ -4802,11 +4802,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackendDev\\SCDBackend.UnitTest\\SCDBackend.UnitTest.csproj",
+      "projectUniqueName": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackend\\SCDBackend.UnitTest\\SCDBackend.UnitTest.csproj",
       "projectName": "SCDBackend.UnitTest",
-      "projectPath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackendDev\\SCDBackend.UnitTest\\SCDBackend.UnitTest.csproj",
+      "projectPath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackend\\SCDBackend.UnitTest\\SCDBackend.UnitTest.csproj",
       "packagesPath": "C:\\Users\\Martin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackendDev\\SCDBackend.UnitTest\\obj\\",
+      "outputPath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackend\\SCDBackend.UnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Martin\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -4822,8 +4822,8 @@
       "frameworks": {
         "netcoreapp3.1": {
           "projectReferences": {
-            "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackendDev\\SCDBackend\\SCDBackend.csproj": {
-              "projectPath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackendDev\\SCDBackend\\SCDBackend.csproj"
+            "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackend\\SCDBackend\\SCDBackend.csproj": {
+              "projectPath": "C:\\Users\\Martin\\Desktop\\Praktik\\SCDBackend\\SCDBackend\\SCDBackend.csproj"
             }
           }
         }
