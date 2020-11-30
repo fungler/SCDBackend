@@ -10,11 +10,9 @@ namespace UnitTest
         {
             Assert.True(true);
         }
-    }
-    public class UnitTest2
-    {
+
         [Fact]
-        public void Test1()
+        public void Test2()
         {
             Assert.True(true);
         }
