@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace UnitTest
 {
-    public class UnitTest1
+    public class UnitTest
     {
 
         private readonly ITestOutputHelper output;
