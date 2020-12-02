@@ -11,7 +11,7 @@ namespace UnitTest
 
         private readonly ITestOutputHelper output;
 
-        public UnitTest1(ITestOutputHelper output)
+        public UnitTest(ITestOutputHelper output)
         {
             this.output = output;
         }
