@@ -76,7 +76,6 @@ namespace SCDBackend.DataAccess
                     res.Add(installation);
                 }
             }
-
             return res;
         }
 
@@ -117,7 +116,7 @@ namespace SCDBackend.DataAccess
             var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
         }
 
-        public async Task<List<Subscription>> GetSubScriptions()
+        public async Task<List<Subscription>> GetSubscriptions()
         {
             await EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
@@ -138,7 +137,7 @@ namespace SCDBackend.DataAccess
             return res;
         }
 
-        public async Task<Subscription> GetSubScription(string id)
+        public async Task<Subscription> GetSubscription(string id)
         {
             await EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.id = @id").WithParameter("@id", id);

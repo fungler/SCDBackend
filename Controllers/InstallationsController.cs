@@ -135,7 +135,7 @@ namespace SCDBackend.Controllers
             string json;
             try 
             {
-                List<Subscription> sub = await cc.GetSubScriptions();
+                List<Subscription> sub = await cc.GetSubscriptions();
                 json = JsonSerializer.Serialize(sub);
             } 
             catch (Exception e)

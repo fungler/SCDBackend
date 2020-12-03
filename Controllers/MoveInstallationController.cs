@@ -21,7 +21,7 @@ namespace SCDBackend.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 
         {
-            Subscription sub = await cc.GetSubScription(content.subscriptionId);
+            Subscription sub = await cc.GetSubscription(content.subscriptionId);
             Client client = await cc.GetClient("1");
             HttpResponseMessage SDDResponse = null;
             Installation i = null;
