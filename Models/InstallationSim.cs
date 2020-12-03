@@ -49,10 +49,19 @@ namespace SCDBackend.Models
             this.output = output;
         }
 
+        private async Task<InstallationSim> Fail()
+        {
+            output.WriteLine(id + " Failing..");
+            await Task.Delay(failTimeMs);
+            endDate = DateTime.Now;
+            output.WriteLine(id + " - END: " + endDate);
+            status = StatusType.STATUS_FINISHED_FAILED;
+            output.WriteLine(id + " - STATUS: " + status);
+            return this;
+        }
+
         public async Task<InstallationSim> runSetup()
         {
-            output.WriteLine(id + " - starting..");
-
             startDate = DateTime.Now;
             output.WriteLine(id + " - START: " + startDate);
 
@@ -62,23 +71,17 @@ namespace SCDBackend.Models
 
 
             status = StatusType.STATUS_RUNNING;
-            output.WriteLine(id + " - running..");
             output.WriteLine(id + " - STATUS: " + status);
+
+            await Task.Delay(runTimeMs);
 
             if (shouldFail)
             {
-                output.WriteLine(id + " Failing..");
-                await Task.Delay(failTimeMs);
-                endDate = DateTime.Now;
-                output.WriteLine(id + " - END: " + endDate);
-                status = StatusType.STATUS_FINISHED_FAILED;
-                output.WriteLine(id + " - STATUS: " + status);
+                InstallationSim failedInstallation = await Fail();
                 return this;
             }
             else
             {
-                output.WriteLine(id + " Working..");
-                await Task.Delay(runTimeMs);
                 endDate = DateTime.Now;
                 output.WriteLine(id + " - END: " + endDate);
                 status = StatusType.STATUS_FINISHED_SUCCESS;
