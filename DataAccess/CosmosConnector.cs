@@ -19,7 +19,7 @@ namespace SCDBackend.DataAccess
         private string databaseId = "frontend_test";
         private string containerId = "dummyInstallations";
 
-        private CosmosClient cosmosClient;
+        public CosmosClient cosmosClient;
         private Microsoft.Azure.Cosmos.Database database;
         private Container container;
 
