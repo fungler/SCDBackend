@@ -16,21 +16,21 @@ namespace SCDBackend.Controllers
     public class MoveInstallationController : ControllerBase
     {
         private static string sddBasePath = "https://localhost:7001";
-        private static CosmosConnector cc = new CosmosConnector();
+        private static CosmosConnector cc = new CosmosConnector(null, "https://fungler.documents.azure.com:443/", "Gs9XLbKvsstuGzfUpbCYNufDBER0o9Ony3WmBo8drTMp4ugd48s2xqAiKQI5Ve9yXiBFnqXqu3Sj8T607uouPA==", "frontend_test" );
 
         [HttpPost("new")]
         public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 
         {
-            Subscription sub = await cc.GetSubscription(content.subscriptionId);
-            Client client = await cc.GetClient("1");
+            //Subscription sub = await cc.GetSubscription(content.subscriptionId);
+            //Client client = await cc.GetClient("1");
             HttpResponseMessage SDDResponse = null;
             Installation i = null;
 
             try 
             {   
                 // Adding random client since the JSON document doesn't contain a client
-                i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
-                await cc.CreateInstallationAsync(i);
+                //i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
+                //await cc.CreateInstallationAsync(i);
             }
             catch (Exception)
             {

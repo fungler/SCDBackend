@@ -11,6 +11,8 @@ namespace SCDBackend.DataAccess
     public sealed class CosmosConnector
     {
 
+        private CosmosConnnectorCreator CCC;
+        /*
         public static CosmosConnector instance { get; } = new CosmosConnector();
 
         private readonly string EndpointUri = "https://fungler.documents.azure.com:443/";
@@ -58,13 +60,26 @@ namespace SCDBackend.DataAccess
                 Console.WriteLine("Except" + e.Data);
             }
         }
+        */
+
+        public CosmosConnector(CosmosConnnectorCreator c)
+        {
+            CCC = c;
+        }
+
+        public CosmosConnector(Dictionary<string, string> containerData, string databaseId, string primaryKey, string endpoint)
+        {
+            Dictionary<string, string> containers = new Dictionary<string, string>();
+            containers.Add("installation", "/installation");
+            CCC = new CosmosConnnectorCreator(endpoint, primaryKey, databaseId, containers);
+        }
 
         public async Task<List<Installation>> GetInstallationsAsync()
         {
-            await EstablishConnection();
+            await CCC.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
 
-            FeedIterator<Installation> queryResultSetIterator = container.GetItemQueryIterator<Installation>(qd);
+            FeedIterator<Installation> queryResultSetIterator = CCC.Containers["installation"].GetItemQueryIterator<Installation>(qd);
             List<Installation> res = new List<Installation>();
 
             while (queryResultSetIterator.HasMoreResults)
@@ -81,11 +96,11 @@ namespace SCDBackend.DataAccess
 
         public async Task<Installation> GetInstallationAsync(string name)
         {
-            await EstablishConnection();
+            await CCC.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.name = @name")
                 .WithParameter("@name", name);
 
-            FeedIterator<Installation> queryResultSetIterator = container.GetItemQueryIterator<Installation>(qd);
+            FeedIterator<Installation> queryResultSetIterator = CCC.Containers["installation"].GetItemQueryIterator<Installation>(qd);
             Installation inst = null;
 
             if (queryResultSetIterator.HasMoreResults)
@@ -102,8 +117,8 @@ namespace SCDBackend.DataAccess
         // TODO check if installation exists
         public async Task CreateInstallationAsync(Installation installation) 
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["installation"];
             var installationItemResponse = await c.CreateItemAsync<Installation>(installation, new PartitionKey(installation.installation));
         }
 
@@ -111,11 +126,12 @@ namespace SCDBackend.DataAccess
         public async Task CreateInstallationAsync(InstallationCopy installation)
         {
             
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["installation"];
             var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
         }
 
+        /*
         public async Task<List<Subscription>> GetSubscriptions()
         {
             await EstablishConnection();
@@ -199,14 +215,15 @@ namespace SCDBackend.DataAccess
             }
             return client;
         }
+        */
 
         public async Task<string> GetItemId(string name)
         {
-            await EstablishConnection();
+            await CCC.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT VALUE c.id FROM c WHERE c.name = @name")
                 .WithParameter("@name", name);
 
-            FeedIterator<string> queryResultSetIterator = container.GetItemQueryIterator<string>(qd);
+            FeedIterator<string> queryResultSetIterator = CCC.Containers["installation"].GetItemQueryIterator<string>(qd);
             string instId = "0";
 
             if (queryResultSetIterator.HasMoreResults)
@@ -223,8 +240,8 @@ namespace SCDBackend.DataAccess
 
         public async Task<int> StartInstallation(string instName)
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["installation"];
 
             Installation toReplace = null;
             toReplace = await GetInstallationAsync(instName);
@@ -246,8 +263,8 @@ namespace SCDBackend.DataAccess
 
         public async Task<int> StopInstallation(string instName)
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["installation"];
 
             Installation toReplace = null;
             toReplace = await GetInstallationAsync(instName);
@@ -269,8 +286,8 @@ namespace SCDBackend.DataAccess
 
         public async Task DeleteInstallation(Installation inst)
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["installation"];
             var documentLink = await GetInstallationAsync(inst.name);
             Console.WriteLine(documentLink.id);
             string id = await GetItemId(inst.name);

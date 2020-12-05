@@ -31,7 +31,11 @@ namespace CosmosConnectorUnitTest
 
         public DatabaseFixture() 
         {
-            Db = new CosmosConnector(Endpoint, PrimaryKey, databaseId, containerId);
+            Dictionary<string, string> a = new Dictionary<string, string>();
+            a.Add("installation", "/installation");
+            CosmosConnnectorCreator c = new CosmosConnnectorCreator(Endpoint, PrimaryKey, databaseId, a);
+            
+            Db = new CosmosConnector(c);
         }
 
         public async Task CreateTestData()
@@ -60,8 +64,6 @@ namespace CosmosConnectorUnitTest
         // Delete container after all tests to ensure that the new dataset is clean
         public void Dispose()
         {   
-            Container c = Db.cosmosClient.GetContainer(databaseId, containerId);
-            c.DeleteContainerAsync();
         }
     }
     public class CosmosConnectorUnitTest : IClassFixture<DatabaseFixture>
@@ -115,7 +117,6 @@ namespace CosmosConnectorUnitTest
             Assert.True(installation.state.Equals("running"));
         }
 
-        [Fact]
         public async Task TestCreateInstallationAsync()
         {
             Installation inst = new Installation("Inst7", "7", null, null, "Cold");
