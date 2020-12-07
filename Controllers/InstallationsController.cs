@@ -19,7 +19,8 @@ namespace SCDBackend.Controllers
     [ApiController]
     public class InstallationsController : ControllerBase
     {
-        private static CosmosConnector cc = new CosmosConnector(null, "https://fungler.documents.azure.com:443/", "Gs9XLbKvsstuGzfUpbCYNufDBER0o9Ony3WmBo8drTMp4ugd48s2xqAiKQI5Ve9yXiBFnqXqu3Sj8T607uouPA==", "frontend_test" );
+        private static CosmosConnnectorCreator ccc = new CosmosConnnectorCreator(Db.Dev);
+        private static CosmosConnector cc = new CosmosConnector(ccc);
 
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
@@ -129,7 +130,6 @@ namespace SCDBackend.Controllers
             }
         }
 
-        /*
         [HttpGet("subscriptions/all")]
         public async Task<IActionResult> getSubscriptions()
         {
@@ -162,7 +162,7 @@ namespace SCDBackend.Controllers
             }
             return Ok(json);
         }
-        */
+        
         [HttpGet("item/getId")]
         public async Task<IActionResult> getItemId([FromQuery] string name)
         {

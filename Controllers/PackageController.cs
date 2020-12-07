@@ -17,7 +17,6 @@ namespace SCDBackend.Controllers
         // Task<String, Task<>>
         public async Task<HttpResponseMessage> GetStateAsync(string instName)
         {
-
             throw new System.NotImplementedException();
         }
 

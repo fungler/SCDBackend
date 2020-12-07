@@ -2,38 +2,64 @@ using System.Collections.Generic;
 using Microsoft.Azure.Cosmos;
 using System.Threading.Tasks;
 using System;
+using System.Configuration;
+using System.Buffers;
+using Newtonsoft.Json;
+using System.IO;
+using SCDBackend.Models;
 
 namespace SCDBackend.DataAccess
 {
     public class CosmosConnnectorCreator
-    {   
+    { 
+        private string Endpoint { get; set; }
+        private string PrimaryKey { get; set; }
 
-        private string Endpoint { get; }
-        private string PrimaryKey { get; }
-
-        private string DatabaseId { get; }
+        private string DatabaseId { get; set; }
 
         // containerId, partitionkey
-        private Dictionary<string, string> ContainerData { get; }
+        private Dictionary<string, string> ContainerData { get; set; }
 
         public Dictionary<string, Container> Containers { get; set; }
 
         public CosmosClient CosmosClient;
 
-        public Database Database;
+        public Microsoft.Azure.Cosmos.Database Database;
 
-        public CosmosConnnectorCreator(string Endpoint, string PrimaryKey, string DatabaseId, Dictionary<string, string> ContainerData)
+        public CosmosConnnectorCreator(Db dbType)
         {
-            this.Endpoint = Endpoint;
-            this.PrimaryKey = PrimaryKey;
-            this.DatabaseId = DatabaseId;
-            this.ContainerData = ContainerData;
-            this.Containers = new Dictionary<string, Container>();
+            string json;
+            using (var sr = new StreamReader("Resources/dbsettings.json"))
+            {
+                json = sr.ReadToEnd();
+            }
+
+            Dictionary<string, DbConfig> c = JsonConvert.DeserializeObject<Dictionary<string, DbConfig>>(json);
+            Containers = new Dictionary<string, Container>();
+            ContainerData = new Dictionary<string, string>();
+            ContainerData.Add("dummyInstallations", "/installation");
+            ContainerData.Add("subscriptions", "/subscriptions");
+            ContainerData.Add("clients", "/clients");
+
+            if(dbType.Equals(Db.Dev))
+            {
+                var db = c["dev"];
+                this.Endpoint = db.endpoint;
+                this.DatabaseId = db.databaseId;
+                this.PrimaryKey = db.key;
+            }
+            else if(dbType.Equals(Db.Test))
+            {
+                var db = c["test"];
+                this.Endpoint = db.endpoint;
+                this.DatabaseId = db.databaseId;
+                this.PrimaryKey = db.key;
+            }
         }
 
         private async Task InitAsync()
         {
-            if (CosmosClient == null || Database == null || Containers == null)
+            if (CosmosClient == null || Database == null || Containers == null || Containers.Count == 0)
             {
                 CosmosClient = new CosmosClient(Endpoint, PrimaryKey);
                 Database = await CosmosClient.CreateDatabaseIfNotExistsAsync(DatabaseId);
@@ -61,5 +87,12 @@ namespace SCDBackend.DataAccess
                 Console.WriteLine("Except" + e.Data);
             }
         }
+    }
+
+
+    public enum Db
+    {
+        Dev,
+        Test
     }
 }

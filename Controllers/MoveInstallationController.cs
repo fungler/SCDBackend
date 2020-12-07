@@ -16,7 +16,9 @@ namespace SCDBackend.Controllers
     public class MoveInstallationController : ControllerBase
     {
         private static string sddBasePath = "https://localhost:7001";
-        private static CosmosConnector cc = new CosmosConnector(null, "https://fungler.documents.azure.com:443/", "Gs9XLbKvsstuGzfUpbCYNufDBER0o9Ony3WmBo8drTMp4ugd48s2xqAiKQI5Ve9yXiBFnqXqu3Sj8T607uouPA==", "frontend_test" );
+
+        private static CosmosConnnectorCreator ccc = new CosmosConnnectorCreator(Db.Dev);
+        private static CosmosConnector cc = new CosmosConnector(ccc);
 
         [HttpPost("new")]
         public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 

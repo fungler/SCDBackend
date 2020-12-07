@@ -12,17 +12,6 @@ namespace CosmosConnectorUnitTest
 
     public class DatabaseFixture : IDisposable
     {
-
-        private static readonly string PrimaryKey = "PcehWtM3wPQmnqPrBXE0KYYQrmVRLpw3MluwlMWXI93lS0XUbmnC8oHC2UJRU1ggBl5WRm68a4GH8NGSS5EZQw==";
-
-        private static readonly string Endpoint = "https://test-database1.documents.azure.com:443/";
-
-        private static string databaseId = "frontend_test";
-        private static string containerId = "dummyInstallations";
-        private static Microsoft.Azure.Cosmos.Database database;
-        private static Container container;
-        private static CosmosClient cosmosClient;
-
         public CosmosConnector Db { get; private set; }
 
         public List<Installation> Installations { get; private set; }
@@ -31,10 +20,7 @@ namespace CosmosConnectorUnitTest
 
         public DatabaseFixture() 
         {
-            Dictionary<string, string> a = new Dictionary<string, string>();
-            a.Add("installation", "/installation");
-            CosmosConnnectorCreator c = new CosmosConnnectorCreator(Endpoint, PrimaryKey, databaseId, a);
-            
+            CosmosConnnectorCreator c = new CosmosConnnectorCreator(SCDBackend.DataAccess.Db.Test);
             Db = new CosmosConnector(c);
         }
 
@@ -63,9 +49,24 @@ namespace CosmosConnectorUnitTest
 
         // Delete container after all tests to ensure that the new dataset is clean
         public void Dispose()
-        {   
+        {
+            var tasks = new List<Task>();
+            Dictionary<string, Container> containers = Db.CCC.Containers;
+            foreach(var c in containers)
+            {
+                tasks.Add(Task.Run(() => c.Value.DeleteContainerAsync()));
+            }
+
+            Task t = Task.WhenAll(tasks);
+
+            try 
+            {
+                t.Wait();
+            }
+            catch {}
         }
     }
+
     public class CosmosConnectorUnitTest : IClassFixture<DatabaseFixture>
     {
         DatabaseFixture fixture;
