@@ -23,16 +23,16 @@ namespace SCDBackend.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 
         {
-            //Subscription sub = await cc.GetSubscription(content.subscriptionId);
-            //Client client = await cc.GetClient("1");
+            Subscription sub = await cc.GetSubscription(content.subscriptionId);
+            Client client = await cc.GetClient("1");
             HttpResponseMessage SDDResponse = null;
             Installation i = null;
 
             try 
             {   
-                // Adding random client since the JSON document doesn't contain a client
-                //i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
-                //await cc.CreateInstallationAsync(i);
+                //7Adding random client since the JSON document doesn't contain a client
+                i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
+                await cc.CreateInstallationAsync(i);
             }
             catch (Exception)
             {

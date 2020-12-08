@@ -166,7 +166,7 @@ namespace SCDBackend.DataAccess
             QueryDefinition qd = new QueryDefinition("SELECT VALUE c.id FROM c WHERE c.name = @name")
                 .WithParameter("@name", name);
 
-            FeedIterator<string> queryResultSetIterator = CCC.Containers["installation"].GetItemQueryIterator<string>(qd);
+            FeedIterator<string> queryResultSetIterator = CCC.Containers["dummyInstallations"].GetItemQueryIterator<string>(qd);
             string instId = "0";
 
             if (queryResultSetIterator.HasMoreResults)
