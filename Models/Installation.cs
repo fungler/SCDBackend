@@ -69,6 +69,15 @@ namespace SCDBackend.Models
     {
         public string name { get; set; }
         public string id { get; set; }
+
+        public string client { get; }
+        
+        public Client(string id, string name)
+        {
+            this.id = id;
+            this.name = name;
+            this.client = "PARTITIONKEY";
+        }
     }
 
     public class Network

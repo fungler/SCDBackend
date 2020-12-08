@@ -236,5 +236,19 @@ namespace SCDBackend.DataAccess
             string id = await GetItemId(inst.name);
             var installationItemResponse = await c.DeleteItemAsync<Installation>(id, new PartitionKey(documentLink.installation));
         }
+
+        public async Task CreateSubscriptionAsync(Subscription subscription)
+        {
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["subscriptions"];
+            await c.CreateItemAsync<Subscription>(subscription, new PartitionKey(subscription.subscription));
+        }
+
+        public async Task CreateClientAsync(Client client)
+        {
+            await CCC.EstablishConnection();
+            Container c = CCC.Containers["clients"];
+            await c.CreateItemAsync<Client>(client, new PartitionKey(client.client));
+        }
     }
 }

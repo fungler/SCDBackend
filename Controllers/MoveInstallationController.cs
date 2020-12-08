@@ -30,7 +30,7 @@ namespace SCDBackend.Controllers
 
             try 
             {   
-                //7Adding random client since the JSON document doesn't contain a client
+                //Adding random client since the JSON document doesn't contain a client
                 i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
                 await cc.CreateInstallationAsync(i);
             }
