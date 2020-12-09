@@ -38,8 +38,8 @@ namespace SCDBackend.DataAccess
             Containers = new Dictionary<string, Container>();
             ContainerData = new Dictionary<string, string>();
             ContainerData.Add("dummyInstallations", "/installation");
-            ContainerData.Add("subscriptions", "/subscription");
-            ContainerData.Add("clients", "/client");
+            ContainerData.Add("subscriptions", "/subscriptions");
+            ContainerData.Add("clients", "/clients");
 
             if(dbType.Equals(Db.Dev))
             {

@@ -70,13 +70,13 @@ namespace SCDBackend.Models
         public string name { get; set; }
         public string id { get; set; }
 
-        public string client { get; }
+        public string clients { get; }
         
         public Client(string id, string name)
         {
             this.id = id;
             this.name = name;
-            this.client = "PARTITIONKEY";
+            this.clients = "PARTITIONKEY";
         }
     }
 

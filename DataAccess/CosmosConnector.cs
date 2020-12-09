@@ -241,14 +241,14 @@ namespace SCDBackend.DataAccess
         {
             await CCC.EstablishConnection();
             Container c = CCC.Containers["subscriptions"];
-            await c.CreateItemAsync<Subscription>(subscription, new PartitionKey(subscription.subscription));
+            await c.CreateItemAsync<Subscription>(subscription, new PartitionKey(subscription.subscriptions));
         }
 
         public async Task CreateClientAsync(Client client)
         {
             await CCC.EstablishConnection();
             Container c = CCC.Containers["clients"];
-            await c.CreateItemAsync<Client>(client, new PartitionKey(client.client));
+            await c.CreateItemAsync<Client>(client, new PartitionKey(client.clients));
         }
     }
 }
