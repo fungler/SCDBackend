@@ -1,0 +1,12 @@
+{
+    "dev": {
+        "endpoint": "https://fungler.documents.azure.com:443/",
+        "databaseid": "frontend_test",
+        "key": "Gs9XLbKvsstuGzfUpbCYNufDBER0o9Ony3WmBo8drTMp4ugd48s2xqAiKQI5Ve9yXiBFnqXqu3Sj8T607uouPA=="
+    },
+    "test": {
+        "endpoint": "https://test-database1.documents.azure.com:443/",
+        "databaseid": "frontend_test",
+        "key": "PcehWtM3wPQmnqPrBXE0KYYQrmVRLpw3MluwlMWXI93lS0XUbmnC8oHC2UJRU1ggBl5WRm68a4GH8NGSS5EZQw=="
+    }
+}
