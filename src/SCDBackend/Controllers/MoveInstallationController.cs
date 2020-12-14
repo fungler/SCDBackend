@@ -49,8 +49,9 @@ namespace SCDBackend.Controllers
                 await cc.DeleteInstallation(i);
                 return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 await cc.DeleteInstallation(i);
                 return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
@@ -63,6 +64,7 @@ namespace SCDBackend.Controllers
         {
             // bypass
             HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             HttpClient client = new HttpClient(clientHandler);
 
             var json = JsonSerializer.Serialize(instRoot);
