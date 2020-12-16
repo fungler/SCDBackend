@@ -9,7 +9,6 @@ using SCDBackend.Models;
 
 namespace CosmosConnectorUnitTest
 {
-
     public class DatabaseFixture : IDisposable
     {
         public CosmosConnector Db { get; private set; }
@@ -24,6 +23,11 @@ namespace CosmosConnectorUnitTest
         {
             CosmosConnnectorCreator c = new CosmosConnnectorCreator(SCDBackend.DataAccess.Db.Test);
             Db = new CosmosConnector(c);
+            try 
+            {
+                Task.Run(()=> CreateTestData()).Wait();
+            } catch {}
+
         }
 
         public async Task CreateTestData()
@@ -115,7 +119,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetInstallationsAsync()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             
             // Installation objects created in DatabaseFixture
             List<Installation> Inst = fixture.Installations;
@@ -138,7 +142,7 @@ namespace CosmosConnectorUnitTest
         // TODO: Doesn't work, FIX!
         public async Task TestGetInstallationAsync()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
 
             var installation = await Task.Run<Installation>(async () => 
             {
@@ -164,7 +168,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetSubscriptionsAsync()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             List<Subscription> subs = fixture.Subscriptions;
 
             List<Subscription> dbSubs = await fixture.Db.GetSubscriptions();
@@ -187,7 +191,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetSubscriptionAsync()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             Subscription s = fixture.Subscriptions[1];
 
             Subscription dbSub = await fixture.Db.GetSubscription(s.id);
@@ -198,7 +202,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task NegativeTestGetSubscriptionAsync()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             Subscription s = await fixture.Db.GetSubscription("4");
             Assert.Null(s);
         }
@@ -206,7 +210,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetClients()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             List<Client> clients = fixture.Clients;
             List<Client> dbClients = await fixture.Db.GetClients();
 
@@ -230,7 +234,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetClient()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             Client c = fixture.Clients[0];
             Client dbc = await fixture.Db.GetClient(c.id);
             Assert.NotNull(c);
@@ -240,7 +244,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestStartInstallation()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             Installation inst = fixture.Installations[3];
             // Make sure installation is not starting/running
             Assert.False(inst.status.Equals("started") || inst.status.Equals("starting")); 
@@ -253,7 +257,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestStopInstallation()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             Installation inst = fixture.Installations[1];
             Assert.False(inst.status.Equals("stopped") || inst.status.Equals("stopping"));
             await fixture.Db.StopInstallation(inst.name);
@@ -265,7 +269,7 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestDeleteInstallation()
         {
-            await fixture.CreateTestData();
+            //await fixture.CreateTestData();
             List<Installation> installations = fixture.Installations;
             var length = installations.Count;
             Installation inst = installations[0];
