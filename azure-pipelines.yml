@@ -18,5 +18,7 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: Test
+  env:
+    SCD_Access: $(GitHubPAT) # the recommended way to map to an env variable
   inputs:
     command: 'test'

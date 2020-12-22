@@ -17,74 +17,47 @@ namespace SCDBackend.Controllers
     {
         private static string sddBasePath = "https://localhost:7001";
 
-        private static CosmosConnnectorCreator ccc = new CosmosConnnectorCreator(Db.Dev);
-        private static CosmosConnnectorCreator tccc = new CosmosConnnectorCreator(Db.Test);
-
-        private static CosmosConnector cc = new CosmosConnector(ccc);
-        private static CosmosConnector testConnector = new CosmosConnector(tccc);
+        private CosmosConnector cc = CosmosConnector.Instance;
 
 
         [HttpPost("new")]
-        public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content, [FromQuery] bool isTest = false) 
+        public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content) 
         {
-            if (isTest)
+            Subscription sub = await cc.GetSubscription(content.subscriptionId);
+            Client client = await cc.GetClient("1");
+            HttpResponseMessage SDDResponse = null;
+            Installation i = null;
+
+            try
             {
-                Subscription sub = await testConnector.GetSubscription(content.subscriptionId);
-                Client client = await testConnector.GetClient("1");
-                Installation i = null;
-
-                try
-                {
-                    //Adding random client since the JSON document doesn't contain a client
-                    i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
-                    await testConnector.CreateInstallationAsync(i);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
-                }
-
-                // Respond to caller
-                return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                //Adding random client since the JSON document doesn't contain a client
+                i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
+                await cc.CreateInstallationAsync(i);
             }
-            else
+            catch (Exception)
             {
-                Subscription sub = await cc.GetSubscription(content.subscriptionId);
-                Client client = await cc.GetClient("1");
-                HttpResponseMessage SDDResponse = null;
-                Installation i = null;
-
-                try
-                {
-                    //Adding random client since the JSON document doesn't contain a client
-                    i = new Installation(content.installation.name, "20.52.46.188:3389", sub, client, content.installation.state);
-                    await cc.CreateInstallationAsync(i);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
-                }
-
-                try
-                {
-                    // Call endpoint from SDD and see if it went well
-                    SDDResponse = await WriteToSDD(content);
-                }
-                catch (Exception) when (!SDDResponse.IsSuccessStatusCode)
-                {
-                    await cc.DeleteInstallation(i);
-                    return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    await cc.DeleteInstallation(i);
-                    return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
-                }
-
-                // Respond to caller
-                return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
+
+            try
+            {
+                // Call endpoint from SDD and see if it went well
+                SDDResponse = await WriteToSDD(content);
+            }
+            catch (Exception) when (!SDDResponse.IsSuccessStatusCode)
+            {
+                await cc.DeleteInstallation(i);
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                await cc.DeleteInstallation(i);
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
+            }
+
+            // Respond to caller
+            return Ok("{\"status\": 200, \"message\": \"Success.\"}");
         }
 
         private async Task<HttpResponseMessage> WriteToSDD(InstallationRoot instRoot) 

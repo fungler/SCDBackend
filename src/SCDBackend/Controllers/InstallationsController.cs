@@ -19,24 +19,15 @@ namespace SCDBackend.Controllers
     [ApiController]
     public class InstallationsController : ControllerBase
     {
-        private static CosmosConnnectorCreator devPreset = new CosmosConnnectorCreator(Db.Dev);
-        private static CosmosConnector cc = new CosmosConnector(devPreset);
-
-        private static CosmosConnnectorCreator testPreset = new CosmosConnnectorCreator(Db.Test);
-        private static CosmosConnector tcc = new CosmosConnector(testPreset);
+        private CosmosConnector cc = CosmosConnector.Instance;
 
         [HttpGet("all")]
-        public async Task<IActionResult> getAllInstallations([FromQuery] bool isTest = false)
+        public async Task<IActionResult> getAllInstallations()
         {
             string json;
             try
             {
-                List<Installation> installations;
-                if (isTest)
-                    installations = await tcc.GetInstallationsAsync();
-                else
-                    installations = await cc.GetInstallationsAsync();
-
+                List<Installation> installations = await cc.GetInstallationsAsync();
                 json = JsonSerializer.Serialize(installations);
             }
             catch (Exception e)
@@ -48,17 +39,12 @@ namespace SCDBackend.Controllers
         }
 
         [HttpGet("name/{name}")]
-        public async Task<IActionResult> getInstallation(string name, [FromQuery] bool isTest = false)
+        public async Task<IActionResult> getInstallation(string name)
         {
             string json;
             try
             {
-                Installation inst;
-                if (isTest)
-                    inst = await tcc.GetInstallationAsync(name);
-                else
-                    inst = await cc.GetInstallationAsync(name);
-
+                Installation inst = await cc.GetInstallationAsync(name);
                 json = JsonSerializer.Serialize(inst);
             }
             catch (Exception e)
@@ -140,17 +126,12 @@ namespace SCDBackend.Controllers
         }
 
         [HttpGet("subscriptions/all")]
-        public async Task<IActionResult> getSubscriptions([FromQuery] bool isTest = false)
+        public async Task<IActionResult> getSubscriptions()
         {
             string json;
             try
             {
-                List<Subscription> sub;
-                if (isTest)
-                    sub = await tcc.GetSubscriptions();
-                else
-                    sub = await cc.GetSubscriptions();
-
+                List<Subscription> sub = await cc.GetSubscriptions();
                 json = JsonSerializer.Serialize(sub);
             }
             catch (Exception e)
@@ -162,17 +143,12 @@ namespace SCDBackend.Controllers
         }
 
         [HttpGet("clients/all")]
-        public async Task<IActionResult> getClients([FromQuery] bool isTest = false)
+        public async Task<IActionResult> getClients()
         {
             string json;
             try
             {
-                List<Client> clients;
-                if (isTest)
-                    clients = await tcc.GetClients();
-                else
-                    clients = await cc.GetClients();
-
+                List<Client> clients = await cc.GetClients();
                 json = JsonSerializer.Serialize(clients);
             }
             catch (Exception e)
@@ -183,15 +159,12 @@ namespace SCDBackend.Controllers
         }
         
         [HttpGet("item/getId")]
-        public async Task<IActionResult> getItemId([FromQuery] string name, [FromQuery] bool isTest = false)
+        public async Task<IActionResult> getItemId([FromQuery] string name)
         {
             string json;
             try
             {
-                if (isTest)
-                    json = await tcc.GetItemId(name);
-                else
-                    json = await cc.GetItemId(name);
+                json = await cc.GetItemId(name);
             }
             catch (Exception e)
             {
@@ -201,15 +174,11 @@ namespace SCDBackend.Controllers
         }
 
         [HttpGet("start")]
-        public async Task<IActionResult> startInstallation([FromQuery] string name, [FromQuery] bool isTest = false)
+        public async Task<IActionResult> startInstallation([FromQuery] string name)
         {
             try
             {
-                int status;
-                if (isTest)
-                    status = await tcc.StartInstallation(name);
-                else
-                    status = await cc.StartInstallation(name);
+                int status = await cc.StartInstallation(name);
 
                 if (status == 1)
                     return Ok("{\"status\": 200, \"message\": \"Success.\"}");
@@ -223,15 +192,11 @@ namespace SCDBackend.Controllers
         }
 
         [HttpGet("stop")]
-        public async Task<IActionResult> stopInstallation([FromQuery] string name, [FromQuery] bool isTest = false)
+        public async Task<IActionResult> stopInstallation([FromQuery] string name)
         {
             try
             {
-                int status;
-                if (isTest)
-                    status = await tcc.StopInstallation(name);
-                else
-                    status = await cc.StopInstallation(name);
+                int status = await cc.StopInstallation(name);
 
                 if (status == 1)
                     return Ok("{\"status\": 200, \"message\": \"Success.\"}");

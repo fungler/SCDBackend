@@ -10,7 +10,6 @@ namespace SCDBackend.IntegrationTests.TestClasses
 {
     public class IntegrationSetup
     {
-        public CosmosConnnectorCreator ccc;
         public CosmosConnector testConnector { get; private set; }
         public List<Installation> Installations { get; private set; }
         public List<Subscription> Subscriptions { get; private set; }
@@ -20,9 +19,9 @@ namespace SCDBackend.IntegrationTests.TestClasses
 
         public IntegrationSetup()
         {
-            ccc = new CosmosConnnectorCreator(Db.Test);
-            ccc.EstablishConnection().Wait();
-            testConnector = new CosmosConnector(ccc);
+            testConnector = CosmosConnector.Instance;
+            testConnector.ConfigureTest();
+            testConnector.CCP.EstablishConnection().Wait();
         }
 
         public async Task<bool> CreateTestData()
@@ -89,7 +88,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
             try
             {
                 var tasks = new List<Task>();
-                Dictionary<string, Container> containers = testConnector.CCC.Containers;
+                Dictionary<string, Container> containers = testConnector.CCP.Containers;
                 foreach (var c in containers)
                 {
                     tasks.Add(Task.Run(() => c.Value.DeleteContainerAsync()));

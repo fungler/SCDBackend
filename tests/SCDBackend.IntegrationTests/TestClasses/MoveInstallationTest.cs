@@ -20,6 +20,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
 
         private readonly WebApplicationFactory<Startup> _factory;
         private readonly IntegrationSetup setup;
+        private readonly CosmosConnector cc = CosmosConnector.Instance;
 
         public MoveInstallationTest(WebApplicationFactory<Startup> factory)
         {
@@ -31,7 +32,6 @@ namespace SCDBackend.IntegrationTests.TestClasses
         public async Task SetupData()
         {
             bool success = await setup.CreateTestData();
-
             Assert.True(success);
         }
 
@@ -40,82 +40,89 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/")]
         public async Task GetEndpoints(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Theory, Priority(3)]
-        [InlineData("api/installations/name/inst1?isTest=true")]
+        [InlineData("api/installations/name/inst1")]
         public async Task GetInstallationTest(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Theory, Priority(4)]
-        [InlineData("api/installations/all?isTest=true")]
+        [InlineData("api/installations/all")]
         public async Task GetAllInstallationsTest(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Theory, Priority(5)]
-        [InlineData("api/installations/subscriptions/all?isTest=true")]
+        [InlineData("api/installations/subscriptions/all")]
         public async Task GetAllSubsTest(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Theory, Priority(6)]
-        [InlineData("api/installations/clients/all?isTest=true")]
+        [InlineData("api/installations/clients/all")]
         public async Task GetAllClientsTest(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Theory, Priority(7)]
-        [InlineData("api/installations/start?name=inst1&isTest=true")]
+        [InlineData("api/installations/start?name=inst1")]
         public async Task StartInstallationTest(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Theory, Priority(8)]
-        [InlineData("api/installations/stop?name=inst1&isTest=true")]
+        [InlineData("api/installations/stop?name=inst1")]
         public async Task StopInstallationTest(string url)
         {
-            var client = _factory.CreateClient();
+            cc.ConfigureTest();
 
+            var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
 
-        [Theory, Priority(9)]
-        [InlineData("api/new-inst/new?isTest=true")]
+        //[Theory, Priority(9)]
+        //[InlineData("api/new-inst/new")]
         public async Task MoveInstallationToCloudTest(string url)
         {
             string testJson = "{" + Environment.NewLine +
@@ -281,7 +288,6 @@ namespace SCDBackend.IntegrationTests.TestClasses
         public async Task CleanUp()
         {
             bool success = await setup.CleanUpTestData();
-
             Assert.True(success);
         }
         

@@ -10,7 +10,7 @@ using SCDBackend.Models;
 
 namespace SCDBackend.DataAccess
 {
-    public class CosmosConnnectorCreator
+    public class CosmosConnnectorPreset
     { 
         private string Endpoint { get; set; }
         private string PrimaryKey { get; set; }
@@ -26,7 +26,7 @@ namespace SCDBackend.DataAccess
 
         public Microsoft.Azure.Cosmos.Database Database;
 
-        public CosmosConnnectorCreator(Db dbType)
+        public CosmosConnnectorPreset(Db dbType)
         {
             string json;
             using (var sr = new StreamReader("Resources/dbsettings.json"))
