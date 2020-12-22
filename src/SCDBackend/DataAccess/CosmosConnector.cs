@@ -13,6 +13,7 @@ namespace SCDBackend.DataAccess
         private static readonly CosmosConnector instance = new CosmosConnector();
         private readonly CosmosConnnectorPreset devPreset = new CosmosConnnectorPreset(Db.Dev);
         private readonly CosmosConnnectorPreset testPreset = new CosmosConnnectorPreset(Db.Test);
+        private readonly CosmosConnnectorPreset integrationTestPreset = new CosmosConnnectorPreset(Db.Test_integration);
 
         public static CosmosConnector Instance { get { return instance; } }
         public CosmosConnnectorPreset CCP { get; private set; }
@@ -27,6 +28,12 @@ namespace SCDBackend.DataAccess
         {
             if (CCP != testPreset)
                 CCP = testPreset;
+        }
+
+        public void ConfigureIntegrationTest()
+        {
+            if (CCP != integrationTestPreset)
+                CCP = integrationTestPreset;
         }
 
         public void ConfigureDev()

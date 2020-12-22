@@ -28,19 +28,20 @@ namespace SCDBackend.IntegrationTests.TestClasses
             setup = new IntegrationSetup();
         }
 
-        [Fact, Priority(2)]
+
+        /*[Fact, Priority(1)]
         public async Task SetupData()
         {
             bool success = await setup.CreateTestData();
             Assert.True(success);
-        }
+        }*/
 
 
-        [Theory, Priority(1)]
+        [Theory, Priority(2)]
         [InlineData("api/")]
         public async Task GetEndpoints(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -52,7 +53,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/installations/name/inst1")]
         public async Task GetInstallationTest(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -64,7 +65,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/installations/all")]
         public async Task GetAllInstallationsTest(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -76,7 +77,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/installations/subscriptions/all")]
         public async Task GetAllSubsTest(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -88,7 +89,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/installations/clients/all")]
         public async Task GetAllClientsTest(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -100,7 +101,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/installations/start?name=inst1")]
         public async Task StartInstallationTest(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -112,7 +113,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         [InlineData("api/installations/stop?name=inst1")]
         public async Task StopInstallationTest(string url)
         {
-            cc.ConfigureTest();
+            cc.ConfigureIntegrationTest();
 
             var client = _factory.CreateClient();
             var res = await client.GetAsync(url);
@@ -282,12 +283,12 @@ namespace SCDBackend.IntegrationTests.TestClasses
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
         
-        [Fact, Priority(100)]
+        /*[Fact, Priority(100)]
         public async Task CleanUp()
         {
             bool success = await setup.CleanUpTestData();
             Assert.True(success);
-        }
+        }*/
         
     }
 }

@@ -55,6 +55,13 @@ namespace SCDBackend.DataAccess
                 this.DatabaseId = db.databaseId;
                 this.PrimaryKey = db.key;
             }
+            else if (dbType.Equals(Db.Test_integration))
+            {
+                var db = c["test_integration"];
+                this.Endpoint = db.endpoint;
+                this.DatabaseId = db.databaseId;
+                this.PrimaryKey = db.key;
+            }
         }
 
         private async Task InitAsync()
@@ -93,6 +100,7 @@ namespace SCDBackend.DataAccess
     public enum Db
     {
         Dev,
-        Test
+        Test,
+        Test_integration
     }
 }

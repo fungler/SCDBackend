@@ -20,7 +20,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
         public IntegrationSetup()
         {
             testConnector = CosmosConnector.Instance;
-            testConnector.ConfigureTest();
+            testConnector.ConfigureIntegrationTest();
             testConnector.CCP.EstablishConnection().Wait();
         }
 
