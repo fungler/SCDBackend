@@ -281,8 +281,6 @@ namespace SCDBackend.IntegrationTests.TestClasses
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
-
-        
         
         [Fact, Priority(100)]
         public async Task CleanUp()
