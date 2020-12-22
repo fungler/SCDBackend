@@ -49,7 +49,6 @@ namespace SCDBackend.IntegrationTests.TestClasses
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
-
         [Theory, Priority(3)]
         [InlineData("api/installations/name/inst1")]
         public async Task GetInstallationTest(string url)
@@ -61,6 +60,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
+
 
         [Theory, Priority(4)]
         [InlineData("api/installations/all")]
