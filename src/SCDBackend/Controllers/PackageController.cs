@@ -14,7 +14,6 @@ namespace SCDBackend.Controllers
     {
         private static string PackageBasePath = "https://localhost:7001";
 
-        // Task<String, Task<>>
         public async Task<HttpResponseMessage> GetStateAsync(string instName)
         {
             throw new System.NotImplementedException();
@@ -27,13 +26,24 @@ namespace SCDBackend.Controllers
 
         public async Task<HttpResponseMessage> StartInstallation(string instName)
         {
-            throw new System.NotImplementedException();
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient();
+            string json = "{'name': '" + instName + "'}";
+
+            HttpResponseMessage res = await client.PostAsync("https://localhost:7001/api/home/start", new StringContent(json, Encoding.UTF8, "application/json"));
+            return res;
         }
 
         public async Task<HttpResponseMessage> StopInstallation(string instName)
         {
-            throw new System.NotImplementedException();
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient();
+            string json = "{'name': '" + instName + "'}";
+
+            HttpResponseMessage res = await client.PostAsync("https://localhost:7001/api/home/stop", new StringContent(json, Encoding.UTF8, "application/json"));
+            return res;
         }
     }
-
 }

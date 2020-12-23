@@ -178,12 +178,19 @@ namespace SCDBackend.Controllers
         {
             try
             {
-                int status = await cc.StartInstallation(name);
+                PackageConnectorController p = new PackageConnectorController();
+                var res = await p.StartInstallation(name);
+                
 
-                if (status == 1)
+                if (res.IsSuccessStatusCode)
+                {
+                    await cc.StartInstallation(name); 
                     return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                }
                 else
+                {
                     return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation - check installation name.\"}");
+                }
             }
             catch (Exception e)
             {
@@ -196,12 +203,19 @@ namespace SCDBackend.Controllers
         {
             try
             {
-                int status = await cc.StopInstallation(name);
+                PackageConnectorController p = new PackageConnectorController();
+                var res = await p.StopInstallation(name);
+                
 
-                if (status == 1)
+                if (res.IsSuccessStatusCode)
+                {
+                    await cc.StopInstallation(name);
                     return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                }
                 else
+                {
                     return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation - check installation name.\"}");
+                }
             }
             catch (Exception e)
             {
@@ -219,5 +233,7 @@ namespace SCDBackend.Controllers
 
             return response;
         }
+
+
     }
 }
