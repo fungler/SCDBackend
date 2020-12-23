@@ -16,20 +16,33 @@ namespace SCDBackend.Controllers
 
         public async Task<HttpResponseMessage> GetStateAsync(string instName)
         {
-            throw new System.NotImplementedException();
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+
+            HttpResponseMessage response = await client.GetAsync(PackageBasePath + "/api/home/registerJson/getState?name=" + instName);
+
+            return response;
         }
 
         public async Task<HttpResponseMessage> MoveInstallation(InstallationRoot content)
         {
-            throw new System.NotImplementedException();
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+
+            var json = JsonSerializer.Serialize(content);
+            var response = await client.PostAsync(PackageBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
+            return response;
         }
 
         public async Task<HttpResponseMessage> StartInstallation(string instName)
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient client = new HttpClient();
-            string json = "{'name': '" + instName + "'}";
+            HttpClient client = new HttpClient(clientHandler);
+
+            string json = "{\"name\": \"" + instName + "\"}";
 
             HttpResponseMessage res = await client.PostAsync("https://localhost:7001/api/home/start", new StringContent(json, Encoding.UTF8, "application/json"));
             return res;
@@ -39,8 +52,9 @@ namespace SCDBackend.Controllers
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient client = new HttpClient();
-            string json = "{'name': '" + instName + "'}";
+            HttpClient client = new HttpClient(clientHandler);
+
+            string json = "{\"name\": \"" + instName + "\"}";
 
             HttpResponseMessage res = await client.PostAsync("https://localhost:7001/api/home/stop", new StringContent(json, Encoding.UTF8, "application/json"));
             return res;

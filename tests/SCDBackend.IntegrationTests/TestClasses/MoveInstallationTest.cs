@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos;
+using SCDBackend.Controllers;
 using SCDBackend.DataAccess;
 using SCDBackend.Models;
 using System;
@@ -98,7 +99,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
 
-        [Theory, Priority(7)]
+/*        [Theory, Priority(7)]
         [InlineData("api/installations/start?name=inst1")]
         public async Task StartInstallationTest(string url)
         {
@@ -121,7 +122,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
 
             Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, res.StatusCode);
         }
-
+*/
 
         //[Theory, Priority(9)]
         //[InlineData("api/new-inst/new")]

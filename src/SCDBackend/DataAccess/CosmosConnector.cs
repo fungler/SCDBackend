@@ -204,7 +204,7 @@ namespace SCDBackend.DataAccess
         }
         
 
-        public async Task<int> StartInstallation(string instName)
+        public async Task<bool> StartInstallation(string instName)
         {
             await CCP.EstablishConnection();
             Container c = CCP.Containers["dummyInstallations"];
@@ -213,21 +213,21 @@ namespace SCDBackend.DataAccess
             toReplace = await GetInstallationAsync(instName);
 
             if (toReplace == null)
-                return 0;
+                return false;
 
             toReplace.status = "started";
 
             string toReplaceId = await GetItemId(instName);
 
             if (toReplaceId == "0")
-                return 0;
+                return false;
 
 
             await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
-            return 1;
+            return true;
         }
 
-        public async Task<int> StopInstallation(string instName)
+        public async Task<bool> StopInstallation(string instName)
         {
             await CCP.EstablishConnection();
             Container c = CCP.Containers["dummyInstallations"];
@@ -236,18 +236,18 @@ namespace SCDBackend.DataAccess
             toReplace = await GetInstallationAsync(instName);
 
             if (toReplace == null)
-                return 0;
+                return false;
 
             toReplace.status = "stopped";
 
             string toReplaceId = await GetItemId(instName);
 
             if (toReplaceId == "0")
-                return 0;
+                return false;
 
 
             await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
-            return 1;
+            return true;
         }
 
         public async Task DeleteInstallation(Installation inst)

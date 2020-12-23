@@ -15,9 +15,8 @@ namespace SCDBackend.Controllers
 
     public class MoveInstallationController : ControllerBase
     {
-        private static string sddBasePath = "https://localhost:7001";
-
         private CosmosConnector cc = CosmosConnector.Instance;
+        private PackageConnectorController pc = new PackageConnectorController();
 
 
         [HttpPost("new")]
@@ -41,45 +40,24 @@ namespace SCDBackend.Controllers
 
             try
             {
-                // Call endpoint from SDD and see if it went well
-                SDDResponse = await WriteToSDD(content);
+                SDDResponse = await pc.MoveInstallation(content);
             }
             catch (Exception) when (!SDDResponse.IsSuccessStatusCode)
             {
                 await cc.DeleteInstallation(i);
                 return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
                 await cc.DeleteInstallation(i);
                 return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
             }
 
-            // Respond to caller
-            return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+            string body = SDDResponse.Content.ReadAsStringAsync().Result;
+            SDDResponse sddres = Newtonsoft.Json.JsonConvert.DeserializeObject<SDDResponse>(body);
+
+            return Ok("{\"status\": 200, \"message\": \"Success.\", \"installation_status\": \"" + sddres.installation_status + "\"}");
         }
 
-        private async Task<HttpResponseMessage> WriteToSDD(InstallationRoot instRoot) 
-        {
-            // bypass
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient client = new HttpClient(clientHandler);
-
-            var json = JsonSerializer.Serialize(instRoot);
-            var response =  await client.PostAsync(sddBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));
-            return response;
-        }
-
-        private async Task<HttpResponseMessage> GetState(string instName)
-        {
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            HttpClient client = new HttpClient(clientHandler);
-
-            HttpResponseMessage response = await client.GetAsync(sddBasePath + "/api/home/registerJson/getState?name="+instName);
-         
-            return response;
-        }
     }
 }

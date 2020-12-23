@@ -20,6 +20,7 @@ namespace SCDBackend.Controllers
     public class InstallationsController : ControllerBase
     {
         private CosmosConnector cc = CosmosConnector.Instance;
+        private PackageConnectorController pc = new PackageConnectorController();
 
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
@@ -74,7 +75,6 @@ namespace SCDBackend.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 return BadRequest(e.StackTrace);
             }
 
@@ -92,7 +92,7 @@ namespace SCDBackend.Controllers
             {
                 InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
 
-                HttpResponseMessage installationStateResponse = await GetState(data.oldName);
+                HttpResponseMessage installationStateResponse = await pc.GetStateAsync(data.oldName);
 
                 if (installationStateResponse.IsSuccessStatusCode)
                 {
@@ -178,19 +178,21 @@ namespace SCDBackend.Controllers
         {
             try
             {
-                PackageConnectorController p = new PackageConnectorController();
-                var res = await p.StartInstallation(name);
-                
+                HttpResponseMessage res = await pc.StartInstallation(name);
+                string body = res.Content.ReadAsStringAsync().Result;
+                SDDResponse sddres = Newtonsoft.Json.JsonConvert.DeserializeObject<SDDResponse>(body);
 
                 if (res.IsSuccessStatusCode)
                 {
-                    await cc.StartInstallation(name); 
-                    return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                    bool success = await cc.StartInstallation(name);
+
+                    if (success)
+                        return Ok("{\"status\": 200, \"message\": \"Success.\", \"installation_status\": \"" + sddres.installation_status +"\"}");
+                    else
+                        return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation.\", \"installation_status\": \"STATUS_START_FAILED\"}");
                 }
                 else
-                {
-                    return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation - check installation name.\"}");
-                }
+                    return BadRequest("{\"status\": 400, \"message\": \"Failed to start installation.\", \"installation_status\": \"" + sddres.installation_status + "\"}");
             }
             catch (Exception e)
             {
@@ -203,37 +205,27 @@ namespace SCDBackend.Controllers
         {
             try
             {
-                PackageConnectorController p = new PackageConnectorController();
-                var res = await p.StopInstallation(name);
-                
+                HttpResponseMessage res = await pc.StopInstallation(name);
+                string body = res.Content.ReadAsStringAsync().Result;
+                SDDResponse sddres = Newtonsoft.Json.JsonConvert.DeserializeObject<SDDResponse>(body);
 
                 if (res.IsSuccessStatusCode)
                 {
-                    await cc.StopInstallation(name);
-                    return Ok("{\"status\": 200, \"message\": \"Success.\"}");
+                    bool success = await cc.StopInstallation(name);
+
+                    if (success)
+                        return Ok("{\"status\": 200, \"message\": \"Success.\", \"installation_status\": \"" + sddres.installation_status + "\"}");
+                    else
+                        return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation.\", \"installation_status\": \"STATUS_STOP_FAILED\"}");
                 }
                 else
-                {
-                    return BadRequest("{\"status\": 400, \"message\": \"Failed to find installation - check installation name.\"}");
-                }
+                    return BadRequest("{\"status\": 400, \"message\": \"Failed to stop installation.\", \"installation_status\": \"" + sddres.installation_status + "\"}");
             }
             catch (Exception e)
             {
                 return BadRequest(e.StackTrace);
             }
         }
-
-        private async Task<HttpResponseMessage> GetState(string instName)
-        {
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient client = new HttpClient(clientHandler);
-
-            HttpResponseMessage response = await client.GetAsync("https://localhost:7001/api/home/registerJson/getState?name=" + instName);
-
-            return response;
-        }
-
 
     }
 }
