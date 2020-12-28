@@ -217,5 +217,39 @@ namespace SCDBackend.Controllers
             }
         }
 
+        [HttpPost("new")]
+        public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content)
+        {
+            var subscription = await cc.GetSubscription(content.subscriptionId);
+            var client = await cc.GetClient("1"); // Client is not part of the Json document
+            HttpResponseMessage SDDResponse = null;
+
+            var installation = new Installation(content.installation.name, "20.52.46.188:3389", subscription, client, content.installation.state);
+
+            try
+            {
+                await cc.CreateInstallationAsync(installation);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                SDDResponse = await pc.MoveInstallation(content);
+            }
+            catch (Exception) when (!SDDResponse.IsSuccessStatusCode)
+            {
+                await cc.DeleteInstallation(installation);
+                return BadRequest("{\"status\": 500, \"message\": \"Error.\"}");
+            }
+            
+            string body = SDDResponse.Content.ReadAsStringAsync().Result;
+            SDDResponse sddres = Newtonsoft.Json.JsonConvert.DeserializeObject<SDDResponse>(body);
+
+            return Ok("{\"status\": 200, \"message\": \"Success.\", \"installation_status\": \"" + sddres.installation_status + "\"}");
+
+        }
     }
 }

@@ -14,5 +14,9 @@ namespace SCDBackend.Controllers
         public Task<HttpResponseMessage> MoveInstallation(InstallationRoot content);
 
         public Task<HttpResponseMessage> GetStateAsync(string instName);
+
+        public Task<HttpResponseMessage> CreateCopy(CopyData copy);
+
+        public Task<HttpResponseMessage> GetInstallationDetails(string path);
     }
 }
