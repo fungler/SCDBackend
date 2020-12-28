@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SCDBackend.DataAccess;
 using SCDBackend.Models;
 using System.Text.Json;
-using Microsoft.AspNetCore.Cors;
 using System.Net.Http;
 using System.Text;
 using System.Net;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace SCDBackend.Controllers
 {
@@ -21,6 +17,8 @@ namespace SCDBackend.Controllers
     {
         private CosmosConnector cc = CosmosConnector.Instance;
         private PackageConnectorController pc = new PackageConnectorController();
+
+        private HttpClient client = new HttpClient();
 
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
@@ -59,16 +57,10 @@ namespace SCDBackend.Controllers
         [HttpGet("json")]
         public async Task<IActionResult> getInstallationJson([FromQuery] string path)
         {
-
-            // Der er problemer med ssl certification, så dette er bare en måde at bypass'e det
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient client = new HttpClient(clientHandler);
-
             try
             {
-                HttpResponseMessage response = await client.GetAsync("https://localhost:7001/api/home/registerJson/getFile?path=" + path);
-
+                var response = await pc.GetInstallationDetails(path);
+                
                 string json = await response.Content.ReadAsStringAsync();
 
                 return Ok(json);
@@ -80,49 +72,47 @@ namespace SCDBackend.Controllers
 
         }
 
-
         [HttpPost("json/copy")]
         public async Task<IActionResult> createInstallationCopy([FromBody] CopyDataDB data)
         {
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient client = new HttpClient(clientHandler);
 
+            // Write to SDDBackend
+            var packageCopy = new CopyData(data.oldName, data.newName);
+
+            try 
+            {
+                var res = await pc.CreateCopy(packageCopy);
+            }
+            catch (HttpRequestException e) when (!e.Message.Contains("200"))
+            {
+                return BadRequest();
+            }
+
+            // Getting data ready for database
+            var dbCopy = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
+            
+            // Check state of the installation that has been copied
+            try 
+            {
+                var instStateRes = await pc.GetStateAsync(data.oldName);
+            }
+            catch (HttpRequestException e) when (!e.Message.Contains("200"))
+            {
+                dbCopy.state = "failed";
+            }
+
+            // Write to database
             try
             {
-                InstallationCopy copyInstallation = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
-
-                HttpResponseMessage installationStateResponse = await pc.GetStateAsync(data.oldName);
-
-                if (installationStateResponse.IsSuccessStatusCode)
-                {
-                    string installationState = await installationStateResponse.Content.ReadAsStringAsync();
-                    copyInstallation.state = installationState;
-                }
-                else
-                {
-                    copyInstallation.state = "failed";
-                }
-
-                await cc.CreateInstallationAsync(copyInstallation);
-
-                string jsonBody = JsonSerializer.Serialize(new CopyData(data.oldName, data.newName));
-
-                HttpResponseMessage response = await client.PostAsync("https://localhost:7001/api/home/registerJson/copy", new StringContent(jsonBody, Encoding.UTF8, "application/json"));
-                HttpStatusCode status = response.StatusCode;
-
-                string json = await response.Content.ReadAsStringAsync();
-
-                if (status == HttpStatusCode.OK)
-                    return Ok(json);
-                else {
-                    return BadRequest(json);
-                }
+                await cc.CreateInstallationAsync(dbCopy); // TODO: Check if failed
             }
             catch (Exception e)
             {
-                return BadRequest(e.StackTrace);
+                // TODO: Delete copy from SDD
+                return BadRequest();
             }
+
+            return Ok();
         }
 
         [HttpGet("subscriptions/all")]
