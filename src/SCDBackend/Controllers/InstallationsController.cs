@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SCDBackend.DataAccess;
 using SCDBackend.Models;
-using System.Text.Json;
 using System.Net.Http;
+using SCDBackend.Models.MetaData;
+using System.Text.Json;
 using System.Text;
 using System.Net;
 
@@ -89,25 +90,25 @@ namespace SCDBackend.Controllers
             }
 
             // Getting data ready for database
-            var dbCopy = new InstallationCopy(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
+            var inst = new Installation(data.newName, "20.52.46.188:3389", data.Subscription, data.copyMethod, data.client);
             
             // Check state of the installation that has been copied
             try 
             {
                 var instStateRes = await pc.GetStateAsync(data.oldName);
-                dbCopy.state = await instStateRes.Content.ReadAsStringAsync();
+                inst.state = await instStateRes.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException e) when (!e.Message.Contains("200"))
             {
-                dbCopy.state = "failed";
+                inst.state = "failed";
             }
 
             // Write to database
             try
             {
-                await cc.CreateInstallationAsync(dbCopy); // TODO: Check if failed
+                await cc.CreateInstallationAsync(inst); // TODO: Check if failed
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // TODO: Delete copy from SDD
                 return BadRequest();
@@ -219,7 +220,7 @@ namespace SCDBackend.Controllers
         }
 
         [HttpPost("new")]
-        public async Task<IActionResult> MoveInstallation([FromBody] InstallationRoot content)
+        public async Task<IActionResult> MoveInstallation([FromBody] InstJsonDocument content)
         {
             var subscription = await cc.GetSubscription(content.subscriptionId);
             var client = await cc.GetClient("1"); // Client is not part of the Json document

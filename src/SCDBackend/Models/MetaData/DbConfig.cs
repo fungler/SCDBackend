@@ -1,8 +1,7 @@
 using System;
 
-namespace SCDBackend.Models
+namespace SCDBackend.Models.MetaData
 {
-
     [Serializable]
     public class DbConfig
     {

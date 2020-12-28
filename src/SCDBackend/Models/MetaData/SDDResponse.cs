@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SCDBackend.Models
+namespace SCDBackend.Models.MetaData
 {
     [Serializable]
     public class SDDResponse

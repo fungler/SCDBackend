@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using System.Net.Http;
-using Microsoft.AspNetCore.Mvc;
 using SCDBackend.Models;
 
 namespace SCDBackend.Controllers
@@ -11,7 +10,7 @@ namespace SCDBackend.Controllers
 
         public Task<HttpResponseMessage> StopInstallation(string instName);
 
-        public Task<HttpResponseMessage> MoveInstallation(InstallationRoot content);
+        public Task<HttpResponseMessage> MoveInstallation(InstJsonDocument content);
 
         public Task<HttpResponseMessage> GetStateAsync(string instName);
 

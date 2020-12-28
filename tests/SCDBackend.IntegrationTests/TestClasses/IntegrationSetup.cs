@@ -74,7 +74,7 @@ namespace SCDBackend.IntegrationTests.TestClasses
 
                     dataCreated = true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }

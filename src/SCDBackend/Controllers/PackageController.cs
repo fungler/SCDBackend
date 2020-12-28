@@ -31,7 +31,7 @@ namespace SCDBackend.Controllers
             return response;
         }
 
-        public async Task<HttpResponseMessage> MoveInstallation(InstallationRoot content)
+        public async Task<HttpResponseMessage> MoveInstallation(InstJsonDocument content)
         {
             var json = JsonSerializer.Serialize(content);
             var response = await Client.PostAsync(PackageBasePath + "/api/home/registerJson", new StringContent(json, Encoding.UTF8, "application/json"));

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using SCDBackend.Models;
+using System.Net;
+using System.Linq;
 
 namespace SCDBackend.DataAccess
 {
@@ -52,12 +52,20 @@ namespace SCDBackend.DataAccess
 
             while (queryResultSetIterator.HasMoreResults)
             {
-                FeedResponse<Installation> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-
-                foreach (Installation installation in currentResultSet)
+                try 
                 {
-                    res.Add(installation);
+                    FeedResponse<Installation> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                    foreach (Installation installation in currentResultSet)
+                    {
+                        res.Add(installation);
+                    }
                 }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
+
+                
             }
             return res;
         }
@@ -88,15 +96,6 @@ namespace SCDBackend.DataAccess
             await CCP.EstablishConnection();
             Container c = CCP.Containers["dummyInstallations"];
             var installationItemResponse = await c.CreateItemAsync<Installation>(installation, new PartitionKey(installation.installation));
-        }
-
-        // overload for installation copy
-        public async Task CreateInstallationAsync(InstallationCopy installation)
-        {
-            
-            await CCP.EstablishConnection();
-            Container c = CCP.Containers["dummyInstallations"];
-            var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
         }
 
         public async Task<List<Subscription>> GetSubscriptions()

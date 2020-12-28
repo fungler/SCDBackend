@@ -6,7 +6,7 @@ using System.Configuration;
 using System.Buffers;
 using Newtonsoft.Json;
 using System.IO;
-using SCDBackend.Models;
+using SCDBackend.Models.MetaData;
 
 namespace SCDBackend.DataAccess
 {

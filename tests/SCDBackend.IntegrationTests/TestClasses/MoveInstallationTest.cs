@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Azure.Cosmos;
-using SCDBackend.Controllers;
 using SCDBackend.DataAccess;
-using SCDBackend.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -18,7 +13,6 @@ namespace SCDBackend.IntegrationTests.TestClasses
     [TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
     public class MoveInstallationTest : IClassFixture<WebApplicationFactory<Startup>>
     {
-
         private readonly WebApplicationFactory<Startup> _factory;
         private readonly IntegrationSetup setup;
         private readonly CosmosConnector cc = CosmosConnector.Instance;
