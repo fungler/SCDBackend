@@ -95,6 +95,7 @@ namespace SCDBackend.Controllers
             try 
             {
                 var instStateRes = await pc.GetStateAsync(data.oldName);
+                dbCopy.state = await instStateRes.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException e) when (!e.Message.Contains("200"))
             {
