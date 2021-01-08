@@ -9,14 +9,14 @@ using System.Net;
 
 namespace SCDBackend.Controllers
 {
-    public class PackageConnectorController : IPackageConnector
+    public class PackageController : IPackageConnector
     {
         private static string PackageBasePath = "https://localhost:7001";
 
         private static HttpClientHandler ClientHandler;
         private static HttpClient Client;
 
-        public PackageConnectorController()
+        public PackageController()
         {
             ClientHandler = new HttpClientHandler();
             
@@ -60,9 +60,9 @@ namespace SCDBackend.Controllers
             return await Client.PostAsync("https://localhost:7001/api/home/registerJson/copy", new StringContent(json, Encoding.UTF8, "application/json"));
         }
 
-        public async Task<HttpResponseMessage> GetInstallationDetails(string path)
+        public async Task<HttpResponseMessage> GetInstallationDetails(string instName)
         {
-            return await Client.GetAsync("https://localhost:7001/api/home/registerJson/getFile?path=" + path);
+            return await Client.GetAsync("https://localhost:7001/api/home/registerJson/getFile?instName=" + instName);
         }
     }
 }

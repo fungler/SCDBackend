@@ -17,9 +17,10 @@ namespace SCDBackend.Controllers
     public class InstallationsController : ControllerBase
     {
         private CosmosConnector cc = CosmosConnector.Instance;
-        private PackageConnectorController pc = new PackageConnectorController();
+        private PackageController pc = new PackageController();
 
         private HttpClient client = new HttpClient();
+
 
         [HttpGet("all")]
         public async Task<IActionResult> getAllInstallations()
@@ -56,11 +57,11 @@ namespace SCDBackend.Controllers
         }
 
         [HttpGet("json")]
-        public async Task<IActionResult> getInstallationJson([FromQuery] string path)
+        public async Task<IActionResult> getInstallationJson([FromQuery] string instName)
         {
             try
             {
-                var response = await pc.GetInstallationDetails(path);
+                var response = await pc.GetInstallationDetails(instName);
                 
                 string json = await response.Content.ReadAsStringAsync();
 
@@ -252,6 +253,22 @@ namespace SCDBackend.Controllers
 
             return Ok("{\"status\": 200, \"message\": \"Success.\", \"installation_status\": \"" + sddres.installation_status + "\"}");
 
+        }
+
+        [HttpGet("checkName/{name}")]
+        public async Task<IActionResult> CheckNameAvailability(string name)
+        {
+            var installations = await cc.GetInstallationsAsync();
+
+            foreach(var inst in installations)
+            {
+                if(name.Equals(inst.name))
+                {
+                    var json = JsonSerializer.Serialize(new JsonMessage("Name already taken"));
+                    return StatusCode((int) HttpStatusCode.NotAcceptable, json); 
+                }
+            }
+            return Ok();
         }
     }
 }
