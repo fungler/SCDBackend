@@ -120,8 +120,6 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetInstallationsAsync()
         {
-            //await fixture.CreateTestData();
-            
             // Installation objects created in DatabaseFixture
             List<Installation> Inst = fixture.Installations;
 
@@ -132,19 +130,20 @@ namespace CosmosConnectorUnitTest
             });
             output.WriteLine(installations.Count.ToString());
             Assert.NotNull(installations);
-            //Assert.True(installations.Count >= 6);
+
             foreach(var inst in installations)
             {
                 Assert.NotNull(inst.client);
                 Assert.NotNull(inst.subscription);
+                
             }
         }
 
-        // TODO: Doesn't work, FIX!
-        public async Task TestGetInstallationAsync()
+        [Theory]
+        [InlineData("inst1", true)]
+        [InlineData("inst100", false)]
+        public async Task TestGetInstallationAsync(string instName, bool isFound)
         {
-            //await fixture.CreateTestData();
-
             var installation = await Task.Run<Installation>(async () => 
             {
                 return await fixture.Db.GetInstallationAsync("inst1");
@@ -155,9 +154,10 @@ namespace CosmosConnectorUnitTest
             Assert.True(installation.state.Equals("started"));
         }
 
+        [Fact]
         public async Task TestCreateInstallationAsync()
         {
-            Installation inst = new Installation("Inst7", "7", null, null, "Cold");
+            Installation inst = new Installation("Inst7", "7", new Subscription("4", "US Presales"), new Client("4", "Swedbank"), "Cold");
             await fixture.Db.CreateInstallationAsync(inst);
 
             Installation fetched = await fixture.Db.GetInstallationAsync(inst.name);
@@ -192,7 +192,6 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task TestGetSubscriptionAsync()
         {
-            //await fixture.CreateTestData();
             Subscription s = fixture.Subscriptions[1];
 
             Subscription dbSub = await fixture.Db.GetSubscription(s.id);
@@ -203,7 +202,6 @@ namespace CosmosConnectorUnitTest
         [Fact]
         public async Task NegativeTestGetSubscriptionAsync()
         {
-            //await fixture.CreateTestData();
             Subscription s = await fixture.Db.GetSubscription("4");
             Assert.Null(s);
         }
