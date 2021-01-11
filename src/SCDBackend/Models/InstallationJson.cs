@@ -1,74 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+
+/*
+These objects are used to represent the JSON document which is 
+used for moving installations from on-premises to Azure.
+*/
 
 namespace SCDBackend.Models
 {
     [Serializable]
-    public class Installation
+    public class InstJsonDocument
     {
-
-        public Installation(string name, string fullAddress, Subscription subscription, Client client, string state)
-        {
-            this.id = Guid.NewGuid();
-            this.name = name;
-            this.installation = "PARTITIONKEY"; // Manually set since we are not partitioning the database
-            this.fullAddress = fullAddress;
-            this.subscription = subscription;
-            this.copyMethod = "Cold";
-            this.client = client;
-            this.status = "cold";
-            this.state = state;
-        }
-
-        public Guid id { get; }
-        public string installation { get; }
-        public string name { get; set; }
-
-        public string fullAddress { get; set; }
-
-        public Subscription subscription { get; set; }
-        public string copyMethod { get; set; }
-        public Client client { get; set; }
-        public string status { get; set; }
-        public string state { get; set; }
-    }
-
-    [Serializable]
-    public class InstallationCopy
-    {
-        public InstallationCopy(string name, string fullAddress, Subscription subscription, string copyMethod, Client client)
-        {
-            this.id = Guid.NewGuid();
-            this.name = name;
-            this.installation = "PARTITIONKEY"; // Manually set since we are not partitioning the database
-            this.fullAddress = fullAddress;
-            this.subscription = subscription;
-            this.copyMethod = copyMethod;
-            this.client = client;
-            this.status = "cold";
-            this.state = "none";
-        }
-
-        public Guid id { get; }
-        public string installation { get; }
-        public string name { get; set; }
-
-        public string fullAddress { get; set; }
-
-        public Subscription subscription { get; set; }
-        public string copyMethod { get; set; }
-        public Client client { get; set; }
-        public string status { get; set; }
-        public string state { get; set; }
-    }
-
-
-    [Serializable]
-    public class Client
-    {
-        public string name { get; set; }
-        public string id { get; set; }
+        public string azureTenant { get; set; }
+        public string subscriptionId { get; set; }
+        public string domainName { get; set; }
+        public Network network { get; set; }
+        public Secrets secrets { get; set; }
+        public Inst installation { get; set; }
     }
 
     public class Network
@@ -237,15 +186,5 @@ namespace SCDBackend.Models
         public InternationalSettings internationalSettings { get; set; }
         public List<VmScaleSet> vmScaleSets { get; set; }
         public List<Vm> vms { get; set; }
-    }
-
-    public class InstallationRoot
-    {
-        public string azureTenant { get; set; }
-        public string subscriptionId { get; set; }
-        public string domainName { get; set; }
-        public Network network { get; set; }
-        public Secrets secrets { get; set; }
-        public Inst installation { get; set; }
     }
 }

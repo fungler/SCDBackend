@@ -3,13 +3,13 @@ using Microsoft.Extensions.Hosting;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System;
-
+using Microsoft.AspNetCore;
 
 namespace SCDBackend
 {
     public class Program
     {
-        public static void main(string[] args)
+        public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
         }
@@ -20,5 +20,7 @@ namespace SCDBackend
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
     }
 }

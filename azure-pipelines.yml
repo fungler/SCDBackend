@@ -1,21 +1,16 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
-- master
+- dev
 
 pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
+  solution: '*/.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
-  
+
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
@@ -23,5 +18,7 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: Test
+  env:
+    SCD_Access: $(GitHubPAT) # the recommended way to map to an env variable
   inputs:
     command: 'test'

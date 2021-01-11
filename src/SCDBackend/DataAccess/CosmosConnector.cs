@@ -1,84 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using SCDBackend.Models;
+using System.Net;
+using System.Linq;
 
 namespace SCDBackend.DataAccess
 {
     public sealed class CosmosConnector
     {
+        private static readonly CosmosConnector instance = new CosmosConnector();
+        private readonly CosmosConnnectorPreset devPreset = new CosmosConnnectorPreset(Db.Dev);
+        private readonly CosmosConnnectorPreset testPreset = new CosmosConnnectorPreset(Db.Test);
+        private readonly CosmosConnnectorPreset integrationTestPreset = new CosmosConnnectorPreset(Db.Test_integration);
 
-        public static CosmosConnector instance { get; } = new CosmosConnector();
+        public static CosmosConnector Instance { get { return instance; } }
+        public CosmosConnnectorPreset CCP { get; private set; }
 
-        private static readonly string EndpointUri = "https://fungler.documents.azure.com:443/";
-        private static readonly string PrimaryKey = "Gs9XLbKvsstuGzfUpbCYNufDBER0o9Ony3WmBo8drTMp4ugd48s2xqAiKQI5Ve9yXiBFnqXqu3Sj8T607uouPA==";
-
-        private static string databaseId = "frontend_test";
-        private static string containerId = "dummyInstallations";
-
-        private static CosmosClient cosmosClient;
-        private static Microsoft.Azure.Cosmos.Database database;
-        private static Container container;
-
-        public CosmosConnector() {}
-
-        private static async Task InitAsync()
+        static CosmosConnector() { }
+        public CosmosConnector()
         {
-            if (cosmosClient == null || database == null || container == null)
-            {
-                cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
-                database = await cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
-                container = await database.CreateContainerIfNotExistsAsync(new ContainerProperties(containerId, "/installation"));
-            }
+            CCP = devPreset;
         }
 
-        private async Task EstablishConnection()
+        public void ConfigureTest()
         {
-            try
-            {
-                await InitAsync();
-            }
-            catch (CosmosException e)
-            {
-                Console.WriteLine("Cosmos except" + e.Data);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Except" + e.Data);
-            }
+            if (CCP != testPreset)
+                CCP = testPreset;
+        }
+
+        public void ConfigureIntegrationTest()
+        {
+            if (CCP != integrationTestPreset)
+                CCP = integrationTestPreset;
+        }
+
+        public void ConfigureDev()
+        {
+            if (CCP != devPreset)
+                CCP = devPreset;
         }
 
         public async Task<List<Installation>> GetInstallationsAsync()
         {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
 
-            FeedIterator<Installation> queryResultSetIterator = container.GetItemQueryIterator<Installation>(qd);
+            FeedIterator<Installation> queryResultSetIterator = CCP.Containers["dummyInstallations"].GetItemQueryIterator<Installation>(qd);
             List<Installation> res = new List<Installation>();
 
             while (queryResultSetIterator.HasMoreResults)
             {
-                FeedResponse<Installation> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-
-                foreach (Installation installation in currentResultSet)
+                try 
                 {
-                    res.Add(installation);
+                    FeedResponse<Installation> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                    foreach (Installation installation in currentResultSet)
+                    {
+                        res.Add(installation);
+                    }
                 }
-            }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
 
+                
+            }
             return res;
         }
 
         public async Task<Installation> GetInstallationAsync(string name)
         {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.name = @name")
                 .WithParameter("@name", name);
 
-            FeedIterator<Installation> queryResultSetIterator = container.GetItemQueryIterator<Installation>(qd);
+            FeedIterator<Installation> queryResultSetIterator = CCP.Containers["dummyInstallations"].GetItemQueryIterator<Installation>(qd);
             Installation inst = null;
 
             if (queryResultSetIterator.HasMoreResults)
@@ -95,25 +93,16 @@ namespace SCDBackend.DataAccess
         // TODO check if installation exists
         public async Task CreateInstallationAsync(Installation installation) 
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCP.EstablishConnection();
+            Container c = CCP.Containers["dummyInstallations"];
             var installationItemResponse = await c.CreateItemAsync<Installation>(installation, new PartitionKey(installation.installation));
         }
 
-        // overload for installation copy
-        public async Task CreateInstallationAsync(InstallationCopy installation)
+        public async Task<List<Subscription>> GetSubscriptions()
         {
-            
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
-            var installationItemResponse = await c.CreateItemAsync<InstallationCopy>(installation, new PartitionKey(installation.installation));
-        }
-
-        public async Task<List<Subscription>> GetSubScriptions()
-        {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
-            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("subscriptions", "/subscriptions"));
+            Container c = CCP.Containers["subscriptions"];
 
             FeedIterator<Subscription> queryResultSetIterator = c.GetItemQueryIterator<Subscription>(qd);
             List<Subscription> res = new List<Subscription>();
@@ -130,11 +119,11 @@ namespace SCDBackend.DataAccess
             return res;
         }
 
-        public async Task<Subscription> GetSubScription(string id)
+        public async Task<Subscription> GetSubscription(string id)
         {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.id = @id").WithParameter("@id", id);
-            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("subscriptions", "/subscriptions"));
+            Container c = CCP.Containers["subscriptions"];
 
             FeedIterator<Subscription> queryResultSetIterator = c.GetItemQueryIterator<Subscription>(qd);
             Subscription sub = null;
@@ -153,9 +142,9 @@ namespace SCDBackend.DataAccess
 
         public async Task<List<Client>> GetClients()
         {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c");
-            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("clients", "/clients"));
+            Container c = CCP.Containers["clients"];
 
             FeedIterator<Client> queryResultSetIterator = c.GetItemQueryIterator<Client>(qd);
             List<Client> res = new List<Client>();
@@ -174,9 +163,9 @@ namespace SCDBackend.DataAccess
 
         public async Task<Client> GetClient(string id)
         {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT * FROM c WHERE c.id = @id").WithParameter("@id", id);
-            Container c = await database.CreateContainerIfNotExistsAsync(new ContainerProperties("clients", "/clients"));
+            Container c = CCP.Containers["clients"];
 
             FeedIterator<Client> queryResultSetIterator = c.GetItemQueryIterator<Client>(qd);
             Client client = null;
@@ -195,11 +184,11 @@ namespace SCDBackend.DataAccess
 
         public async Task<string> GetItemId(string name)
         {
-            await EstablishConnection();
+            await CCP.EstablishConnection();
             QueryDefinition qd = new QueryDefinition("SELECT VALUE c.id FROM c WHERE c.name = @name")
                 .WithParameter("@name", name);
 
-            FeedIterator<string> queryResultSetIterator = container.GetItemQueryIterator<string>(qd);
+            FeedIterator<string> queryResultSetIterator = CCP.Containers["dummyInstallations"].GetItemQueryIterator<string>(qd);
             string instId = "0";
 
             if (queryResultSetIterator.HasMoreResults)
@@ -214,60 +203,74 @@ namespace SCDBackend.DataAccess
         }
         
 
-        public async Task<int> StartInstallation(string instName)
+        public async Task<bool> StartInstallation(string instName)
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCP.EstablishConnection();
+            Container c = CCP.Containers["dummyInstallations"];
 
             Installation toReplace = null;
             toReplace = await GetInstallationAsync(instName);
 
             if (toReplace == null)
-                return 0;
+                return false;
 
             toReplace.status = "started";
 
             string toReplaceId = await GetItemId(instName);
 
             if (toReplaceId == "0")
-                return 0;
+                return false;
 
 
             await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
-            return 1;
+            return true;
         }
 
-        public async Task<int> StopInstallation(string instName)
+        public async Task<bool> StopInstallation(string instName)
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCP.EstablishConnection();
+            Container c = CCP.Containers["dummyInstallations"];
 
             Installation toReplace = null;
             toReplace = await GetInstallationAsync(instName);
 
             if (toReplace == null)
-                return 0;
+                return false;
 
             toReplace.status = "stopped";
 
             string toReplaceId = await GetItemId(instName);
 
             if (toReplaceId == "0")
-                return 0;
+                return false;
 
 
             await c.ReplaceItemAsync<Installation>(toReplace, toReplaceId, new PartitionKey(toReplace.installation));
-            return 1;
+            return true;
         }
 
         public async Task DeleteInstallation(Installation inst)
         {
-            await EstablishConnection();
-            Container c = cosmosClient.GetDatabase(databaseId).GetContainer(containerId);
+            await CCP.EstablishConnection();
+            Container c = CCP.Containers["dummyInstallations"];
             var documentLink = await GetInstallationAsync(inst.name);
             Console.WriteLine(documentLink.id);
             string id = await GetItemId(inst.name);
             var installationItemResponse = await c.DeleteItemAsync<Installation>(id, new PartitionKey(documentLink.installation));
+        }
+
+        public async Task CreateSubscriptionAsync(Subscription subscription)
+        {
+            await CCP.EstablishConnection();
+            Container c = CCP.Containers["subscriptions"];
+            await c.CreateItemAsync<Subscription>(subscription, new PartitionKey(subscription.subscriptions));
+        }
+
+        public async Task CreateClientAsync(Client client)
+        {
+            await CCP.EstablishConnection();
+            Container c = CCP.Containers["clients"];
+            await c.CreateItemAsync<Client>(client, new PartitionKey(client.clients));
         }
     }
 }
